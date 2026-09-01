@@ -1,0 +1,29 @@
+name: analytics_portfolio
+
+profile: analytics_portfolio
+
+seed-paths: ["seeds"]
+model-paths: ["models"]
+macro-paths: ["macros"]
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  # Builds seeds into '<your_schema_name>_raw'
+  # jaffle_shop:
+  #   +schema: raw
+
+models:
+  # jaffle_shop:
+  #   +static_analysis: strict
+  #   # Materialize staging models as views, and marts as tables
+  #   staging:
+  #     +materialized: view
+  #   marts:
+  #     +materialized: table
+  
+  analytics_portfolio:
+    example:
+      +enabled: false #exclude this folder when building dbt projects
+
