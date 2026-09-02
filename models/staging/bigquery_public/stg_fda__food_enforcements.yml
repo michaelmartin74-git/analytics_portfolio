@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_fda__food_enforcement
+  - name: stg_fda__food_enforcements
     description: "Staging model for FDA food enforcement recalls with parsed dates and quantities."
     columns:
       - name: recall_sk

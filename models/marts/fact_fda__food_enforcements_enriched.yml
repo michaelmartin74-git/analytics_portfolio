@@ -1,0 +1,95 @@
+version: 2
+
+models:
+  - name: fact_fda__food_enforcements_enriched
+    description: "Fact model for FDA food enforcement enriched with recall reason categories."
+    columns:
+      - name: recall_sk
+        description: "{{ doc('column_recall_sk') }}"
+
+      - name: class
+        description: "{{ doc('column_classification') }}"
+
+      - name: postal_code
+        description: "{{ doc('column_postal_code') }}"
+
+      - name: recall_number
+        description: "{{ doc('column_recall_number') }}"
+
+      - name: geo_city
+        description: "{{ doc('column_city') }}"
+
+      - name: event_id
+        description: "{{ doc('column_event_id') }}"
+
+      - name: distribution_pattern
+        description: "{{ doc('column_distribution_pattern') }}"
+
+      - name: recalling_firm
+        description: "{{ doc('column_recalling_firm') }}"
+
+      - name: voluntary_mandated
+        description: "{{ doc('column_voluntary_mandated') }}"
+
+      - name: geo_state
+        description: "{{ doc('column_state') }}"
+
+      - name: reason
+        description: "{{ doc('column_reason_for_recall') }}"
+
+      - name: initial_notification
+        description: "{{ doc('column_initial_firm_notification') }}"
+
+      - name: status
+        description: "{{ doc('column_status') }}"
+
+      - name: product_type
+        description: "{{ doc('column_product_type') }}"
+
+      - name: geo_country
+        description: "{{ doc('column_country') }}"
+
+      - name: product_description
+        description: "{{ doc('column_product_description') }}"
+
+      - name: address_line_1
+        description: "{{ doc('column_address_line_1') }}"
+
+      - name: address_line_2
+        description: "{{ doc('column_address_line_2') }}"
+
+      - name: affected_product_quantity
+        description: "{{ doc('column_product_quantity') }}"
+
+      - name: affected_amount_unit_type
+        description: "{{ doc('column_affected_amount_unit_type') }}"
+
+      - name: certification_date_sk
+        description: "{{ doc('column_certification_date_sk') }}"
+
+      - name: report_date_sk
+        description: "{{ doc('column_report_date') }}"
+
+      - name: termination_date_sk
+        description: "{{ doc('column_termination_date_sk') }}"
+
+      - name: recall_initiation_date_sk
+        description: "{{ doc('column_recall_initiation_date') }}"
+
+      - name: affected_amount
+        description: "{{ doc('column_affected_amount') }}"
+
+      - name: reason_category
+        description: "{{ doc('column_reason_category') }}"
+
+      - name: zip_county
+        description: "{{ doc('column_zip_county') }}"
+
+      - name: zip_state
+        description: "{{ doc('column_zip_state') }}"
+
+      - name: zip_state_county_fips
+        description: "{{ doc('column_state_county_fips') }}"
+
+      - name: zip_class_fips
+        description: "{{ doc('column_class_fips') }}"

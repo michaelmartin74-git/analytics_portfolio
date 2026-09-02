@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_fda__food_enforcement
+  - name: int_fda__food_enforcements_enriched
     description: "Intermediate model for FDA food enforcement enriched with recall reason categories."
     columns:
       - name: reason_category

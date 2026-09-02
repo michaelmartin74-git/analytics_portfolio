@@ -14,5 +14,7 @@ models:
   analytics_portfolio:
     staging:
       +materialized: view
+    intermediate:
+      +materialized: ephemeral
     marts:
       +materialized: table
