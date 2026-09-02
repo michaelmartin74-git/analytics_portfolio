@@ -14,10 +14,9 @@ recalls as (
     ,rc.category as reason_category
     from recalls r
     left join reason_category rc
-        on rc.reason = recalls.reason
+        on rc.reason = r.reason
 )
 
 select
 *
 from final
-;
