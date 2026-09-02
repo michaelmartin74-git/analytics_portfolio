@@ -10,19 +10,19 @@ source as (
         ['event_id', 'classification','recall_number','report_date'] 
      ) }} as recall_sk
     ,cast(classification as string) as class
-    ,cast(postal_code as string) as postal_code --join to zip dim having lat lon
+    ,cast(substr(postal_code,1,5) as string) as postal_code
     ,cast(recall_number as string) as recall_number
-    ,cast(city as string) as geo_city  --join to city dim
+    ,cast(city as string) as geo_city 
     ,cast(event_id as string) as event_id
     ,cast(distribution_pattern as string) as distribution_pattern
     ,cast(recalling_firm as string) as recalling_firm
     ,cast(voluntary_mandated as string) as voluntary_mandated
     ,cast(state as string) as geo_state 
-    ,cast(reason_for_recall as string) as reason --look into reason seeds file
+    ,cast(reason_for_recall as string) as reason
     ,cast(initial_firm_notification as string) as initial_notification
     ,cast(status as string) as status
     ,cast(product_type as string) as product_type   
-    ,cast(country as string) as geo_country --add dim country
+    ,cast(country as string) as geo_country
     ,cast(product_description as string) as product_description
     ,cast(code_info as string) as product_code_info
     ,cast(address_1 as string) as address_line_1
