@@ -10,7 +10,7 @@ source as (
         ['event_id', 'classification','recall_number','report_date'] 
      ) }} as recall_sk
     ,cast(classification as string) as class
-    ,cast(substr(postal_code,1,5) as string) as postal_code
+    ,cast(postal_code as string) as postal_code
     ,cast(recall_number as string) as recall_number
     ,cast(city as string) as geo_city 
     ,cast(event_id as string) as event_id

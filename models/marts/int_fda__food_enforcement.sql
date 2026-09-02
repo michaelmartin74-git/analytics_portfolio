@@ -24,7 +24,7 @@ recalls as (
     left join reason_category rc
         on rc.reason = r.reason
     left join zip_code_mappings zm
-        on zm.zip_code = r.postal_code
+        on zm.zip_code = substr(r.postal_code,1,5)
 )
 
 select

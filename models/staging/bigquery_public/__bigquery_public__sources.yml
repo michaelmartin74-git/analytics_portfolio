@@ -1,14 +1,13 @@
 version: 2
 
-# Try using these source definitions instead!
 sources:
   - name: fda_food
     database: bigquery-public-data
     schema: fda_food
-    description: Public datasets available through BigQuery
+    description: "{{ doc('source_fda_food') }}"
     tables:
       - name: food_enforcement
-        description: One record per recall recorded by the US FDA.
+        description: "{{ doc('table_food_enforcement') }}"
 
         config:
           loaded_at_field: "CAST(report_date AS TIMESTAMP)"
@@ -23,100 +22,60 @@ sources:
 
         columns:
           - name: classification
-            description: >
-              Numerical designation (I, II, or III) assigned by FDA indicating health hazard severity.
-              Class I = High risk (serious injury/death).
-              Class II = Moderate risk (temporary/slight health threat).
-              Class III = Low risk (unlikely adverse health reaction, minor violations).
-
-          - name: center_classification_date
-            description: ""
+            description: "{{ doc('column_classification') }}"
 
           - name: report_date
-            description: "Date the FDA issued the enforcement report for the product recall."
+            description: "{{ doc('column_report_date') }}"
             data_tests:
               - not_null
 
-          - name: postal_code
-            description: ""
-
-          - name: termination_date
-            description: ""
-
           - name: recall_initiation_date
-            description: "Date the firm first began notifying the public or consignees of the recall."
+            description: "{{ doc('column_recall_initiation_date') }}"
 
           - name: recall_number
-            description: "Numerical designation assigned by FDA to a specific recall event for tracking."
+            description: "{{ doc('column_recall_number') }}"
 
           - name: city
-            description: "The city where the recalling firm is located."
+            description: "{{ doc('column_city') }}"
 
           - name: event_id
-            description: "Numerical designation assigned by FDA to a specific recall event for tracking."
+            description: "{{ doc('column_event_id') }}"
             data_tests:
               - not_null
 
           - name: distribution_pattern
-            description: "General area of initial distribution (e.g., states, countries, or nationwide)."
+            description: "{{ doc('column_distribution_pattern') }}"
 
           - name: recalling_firm
-            description: "The firm that initiates or holds primary responsibility for the recalled product."
+            description: "{{ doc('column_recalling_firm') }}"
 
           - name: voluntary_mandated
-            description: "Indicates whether the recall was firm-initiated (voluntary) or ordered by the FDA (mandated)."
+            description: "{{ doc('column_voluntary_mandated') }}"
 
           - name: state
-            description: "The U.S. state where the recalling firm is located."
+            description: "{{ doc('column_state') }}"
 
           - name: reason_for_recall
-            description: "Description of how the product is defective and violates statutes."
+            description: "{{ doc('column_reason_for_recall') }}"
 
           - name: initial_firm_notification
-            description: "Method(s) used by the firm to initially notify consignees or the public."
+            description: "{{ doc('column_initial_firm_notification') }}"
 
           - name: status
-            description: "Recall status: On-Going (in progress), Completed (retrieved/corrected), Terminated (FDA closed), or Pending (classification in progress)."
+            description: "{{ doc('column_status') }}"
             data_tests:
-              - accepted_values: 
+              - accepted_values:
                   arguments:
-                    values: ['Terminated','Ongoing','Completed']
-
-          - name: product_type
-            description: ""
+                    values: ['Terminated', 'Ongoing', 'Completed']
 
           - name: country
-            description: "The country where the recalling firm is located."
+            description: "{{ doc('column_country') }}"
 
           - name: product_description
-            description: "Brief description of the product being recalled."
+            description: "{{ doc('column_product_description') }}"
 
           - name: code_info
-            description: "Lot/serial numbers, expiration dates, or codes appearing on the product/labeling."
-
-          - name: address_1
-            description: ""
-
-          - name: address_2
-            description: ""
+            description: "{{ doc('column_code_info') }}"
 
           - name: product_quantity
-            description: "The amount of defective product subject to recall."
-
-          - name: more_code_info
-            description: ""
-
-      # - name: raw_orders
-      #   description: One record per order (consisting of one or more order items)
-      #   config:
-      #     loaded_at_field: ordered_at
-      # - name: raw_items
-      #   description: Items included in an order
-      # - name: raw_stores
-      #   config:
-      #     loaded_at_field: opened_at
-      # - name: raw_products
-      #   description: One record per SKU for items sold in stores
-      # - name: raw_supplies
-      #   description: One record per supply per SKU of items sold in stores
-        
+            description: "{{ doc('column_product_quantity') }}"

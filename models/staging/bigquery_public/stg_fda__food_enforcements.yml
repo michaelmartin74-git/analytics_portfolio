@@ -5,16 +5,16 @@ models:
     description: "Staging model for FDA food enforcement recalls with parsed dates and quantities."
     columns:
       - name: recall_sk
-        description: "Primary key generated via hash of event_id, classification, recall_number, and report_date."
+        description: "{{ doc('column_recall_sk') }}"
         tests:
           - unique
           - not_null
 
       - name: affected_product_quantity
-        description: "Raw, unparsed string text representing quantity and unit of measure."
+        description: "{{ doc('column_affected_product_quantity') }}"
 
       - name: affected_amount
-        description: "Parsed numeric quantity extracted from product_affected_quantity (commas stripped)."
+        description: "{{ doc('column_affected_amount') }}"
 
       - name: affected_amount_unit_type
-        description: "Parsed unit description text following the numeric quantity (e.g., 'boxes', 'cases', 'units')."
+        description: "{{ doc('column_affected_amount_unit_type') }}"
