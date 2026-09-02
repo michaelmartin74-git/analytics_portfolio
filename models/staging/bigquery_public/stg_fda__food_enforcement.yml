@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_fda__food_enforcement
+    description: "Staging model for FDA food enforcement recalls with parsed dates and quantities."
+    columns:
+      - name: surrogate_key
+        description: "Primary key generated via hash of event_id, classification, recall_number, and report_date."
+        tests:
+          - unique
+          - not_null
+
+      - name: affected_product_quantity
+        description: "Raw, unparsed string text representing quantity and unit of measure."
+
+      - name: affected_amount
+        description: "Parsed numeric quantity extracted from product_affected_quantity (commas stripped)."
+
+      - name: affected_amount_unit_type
+        description: "Parsed unit description text following the numeric quantity (e.g., 'boxes', 'cases', 'units')."
