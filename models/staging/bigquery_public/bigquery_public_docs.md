@@ -6,6 +6,10 @@ Public datasets available through BigQuery
 One record per recall recorded by the US FDA.
 {% enddocs %}
 
+{% docs column_recall_sk %}
+Primary key generated via hash of `event_id`, `classification`, `recall_number`, and `report_date`.
+{% enddocs %}
+
 {% docs column_classification %}
 Numerical designation (I, II, or III) assigned by FDA indicating health hazard severity:
 - **Class I:** High risk (serious injury/death).
@@ -81,10 +85,6 @@ Lot/serial numbers, expiration dates, or codes appearing on the product/labeling
 The amount of defective product subject to recall.
 {% enddocs %}
 
-{% docs column_recall_sk %}
-Primary key generated via hash of `event_id`, `classification`, `recall_number`, and `report_date`.
-{% enddocs %}
-
 {% docs column_affected_product_quantity %}
 Raw, unparsed string text representing quantity and unit of measure.
 {% enddocs %}
@@ -95,4 +95,40 @@ Parsed numeric quantity extracted from `product_affected_quantity` (commas strip
 
 {% docs column_affected_amount_unit_type %}
 Parsed unit description text following the numeric quantity (e.g., 'boxes', 'cases', 'units').
+{% enddocs %}
+
+{% docs column_reason_category %}
+Derived categories from free-text recall reasons matching keywords (allergens, contaminants, undeclared, etc.).
+{% enddocs %}
+
+{% docs column_postal_code %}
+Postal code associated with recall origin.
+{% enddocs %}
+
+{% docs column_product_type %}
+Product category affected by recall.
+{% enddocs %}
+
+{% docs column_address_line_1 %}
+Address (line 1) associated with firm affected by recall.
+{% enddocs %}
+
+{% docs column_address_line_2 %}
+Address (line 2) associated with firm affected by recall.
+{% enddocs %}
+
+{% docs column_zip_county %}
+County mapped to source zip code of recall (limited to US postal codes only).
+{% enddocs %}
+
+{% docs column_zip_state %}
+US state mapped to source zip code of recall (limited to US postal codes only).
+{% enddocs %}
+
+{% docs column_certification_date_sk %}
+Recall certification date codified into a surrogate key equivalent.
+{% enddocs %}
+
+{% docs column_termination_date_sk %}
+Recall termination date codified into a surrogate key equivalent.
 {% enddocs %}

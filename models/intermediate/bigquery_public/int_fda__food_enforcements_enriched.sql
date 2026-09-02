@@ -1,7 +1,7 @@
 with
 
 recalls as (
-    select * from {{ ref('stg_fda__food_enforcement') }}
+    select * from {{ ref('stg_fda__food_enforcements') }}
 )
 
 ,reason_category as (
