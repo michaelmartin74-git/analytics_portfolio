@@ -1,0 +1,7 @@
+version: 2
+
+seeds:
+  - name: zip_codes
+    config:
+      column_types:
+        zip: string(5) 

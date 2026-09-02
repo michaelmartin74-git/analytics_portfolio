@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: stg__zip_code_mappings
+    description: "Staging model for US zip code mappings, coercing zip codes into 5 digit strings"
+    columns:
+      - name: zip_code
+        description: "5 digit US zip code"
+
+      - name: geo_county
+        description: "US county associated with zip code"
+
+      - name: state_county_fips
+        description: "A state and county FIPS ('fp') code is a standard five-digit numeric identifier used by the U.S. government to uniquely name and locate specific states and counties"
+
+      - name: class_fips
+        description: "Federal Information Processing Series (FIPS) class code used by the U.S. Census Bureau to classify the specific type of geographic entity linked to a given ZIP Code"
