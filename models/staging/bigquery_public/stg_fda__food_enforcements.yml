@@ -4,7 +4,7 @@ models:
   - name: stg_fda__food_enforcement
     description: "Staging model for FDA food enforcement recalls with parsed dates and quantities."
     columns:
-      - name: surrogate_key
+      - name: recall_sk
         description: "Primary key generated via hash of event_id, classification, recall_number, and report_date."
         tests:
           - unique

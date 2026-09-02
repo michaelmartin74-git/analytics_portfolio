@@ -1,15 +1,26 @@
-# 🥪 The Jaffle Shop 🦘
+# Public Analytics Engineering Portfolio: dbt Projects
 
-_powered by the dbt Fusion engine_
+This repository contains public dbt projects built against public datasets. It is designed to demonstrate practical data modeling, transformation patterns, and dbt best practices in a portfolio setting.
 
-Welcome! This is a sandbox project for exploring the basic functionality of Fusion. It's based on a fictional restaurant called the Jaffle Shop that serves [jaffles](https://en.wikipedia.org/wiki/Pie_iron).
+## What's Included
+* **Data Sources:** Public datasets hosted on [BigQuery / Snowflake / etc.]
+* **Core Patterns:** [e.g., Staging/Intermediate/Marts layer architecture, custom macros, data tests, documentation]
 
-To get started:
-1. Set up your database connection in `~/.dbt/profiles.yml`. If you got here by running `dbt init`, you should already be good to go.
-> Recommended to use environment variables to configure profiles.yml, copy and paste file .env.example in this project into your .env and populate the project ID and dataset. 
-3. Run `dbt build`. That's it!
+## Quickstart
 
-> [!NOTE]
-> If you're brand-new to dbt, we recommend starting with the [dbt Learn](https://learn.getdbt.com/) platform. It's a free, interactive way to learn dbt, and it's a great way to get started if you're new to the tool.
+### 1. Prerequisites & Environment Setup
+Clone the repository and set up your local environment variables:
+```bash
+cp .env.example .env
+```
+Update .env with your specific database target, project ID, and dataset credential
 
-### MIKE - Make a note about setting up an env to connect to profiles.yml
+### 2. Configure Credentials
+Ensure your ~/.dbt/profiles.yml targets the environment variables defined in your .env file.
+
+### 3. Build the Project
+Run the full build pipeline (seeds, models, tests):
+```bash
+dbt build
+```
+> Note: If you are new to dbt, refer to the official dbt Documentation or dbt Learn.
