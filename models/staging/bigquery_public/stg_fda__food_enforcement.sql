@@ -8,7 +8,7 @@ source as (
     select
      {{ dbt_utils.generate_surrogate_key(
         ['event_id', 'classification','recall_number','report_date'] 
-     ) }} as surrogate_key
+     ) }} as recall_sk
     ,cast('classification' as string) as class
     ,cast('postal_code' as string) as postal_code --join to zip dim having lat lon
     ,cast('recall_number' as string) as recall_number
