@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: int_fda__food_enforcement
+    description: "Intermediate model for FDA food enforcement enriched with recall reason categories."
+    columns:
+      - name: reason_category
+        description: "Derived categories from free-text recall reasons matching keywords (allergens, contaminants, undeclared, etc.)."
