@@ -41,9 +41,9 @@ recalls as (
     ,cast(format_date('%Y%m%d', r.report_date) as int64) as report_date_sk
     ,cast(format_date('%Y%m%d', r.termination_date) as int64) as termination_date_sk
     ,cast(format_date('%Y%m%d', r.recall_initiation_date) as int64) as recall_initiation_date_sk
-    ,date_diff(r.recall_initiation_date, r.classification_date, day) as init_to_class_days
-    ,date_diff(r.classification_date, r.termination_date, day) as class_to_term_days    
-    ,date_diff(r.recall_initiation_date, r.termination_date, day) as init_to_term_days
+    ,date_diff(r.classification_date, r.recall_initiation_date, day) as init_to_class_days
+    ,date_diff(r.termination_date, r.classification_date, day) as class_to_term_days    
+    ,date_diff(r.termination_date, r.recall_initiation_date, day) as init_to_term_days
     ,r.affected_amount
     ,rc.category as reason_category
     ,zm.geo_county as zip_county
