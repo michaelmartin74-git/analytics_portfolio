@@ -2,16 +2,10 @@ version: 2
 
 models:
   - name: stg__zip_code_mappings
-    description: "Staging model for US zip code mappings, coercing zip codes into 5 digit strings"
+    description: "Staging model for US zip code mappings, coercing zip codes into 5 digit strings. Resolves duplicate counties to first per zip code"
     columns:
       - name: zip_code
         description: "{{ doc('column_zip_code') }}"
 
       - name: geo_county
         description: "{{ doc('column_geo_county') }}"
-
-      - name: state_county_fips
-        description: "{{ doc('column_state_county_fips') }}"
-
-      - name: class_fips
-        description: "{{ doc('column_class_fips') }}"

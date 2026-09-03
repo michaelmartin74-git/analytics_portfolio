@@ -14,6 +14,7 @@ select
 ,status
 ,product_type
 ,geo_country
+,product_sk as affected_sku
 ,product_description
 ,address_line_1
 ,address_line_2
@@ -23,6 +24,9 @@ select
 ,report_date_sk
 ,termination_date_sk
 ,recall_initiation_date_sk
+,greatest(init_to_class_days,0) as init_to_class_days
+,greatest(class_to_term_days,0) as class_to_term_days
+,greatest(init_to_term_days,0) as init_to_term_days
 ,affected_amount
 ,reason_category
 ,zip_county

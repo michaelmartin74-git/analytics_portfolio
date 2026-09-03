@@ -6,3 +6,6 @@ models:
     columns:
       - name: reason_category
         description: "{{ doc('column_reason_category') }}"
+
+      - name: product_sk
+        description: "{{ doc('column_product_sk') }}" 

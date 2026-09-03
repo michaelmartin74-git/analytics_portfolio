@@ -7,7 +7,7 @@ source as (
 ,renamed as (
     select
      {{ dbt_utils.generate_surrogate_key(
-        ['event_id', 'classification','recall_number','report_date'] 
+        ['event_id', 'classification','recall_number','report_date','product_description','product_quantity'] 
      ) }} as recall_sk
     ,cast(classification as string) as class
     ,cast(postal_code as string) as postal_code
@@ -23,6 +23,9 @@ source as (
     ,cast(status as string) as status
     ,cast(product_type as string) as product_type   
     ,cast(country as string) as geo_country
+    ,{{ dbt_utils.generate_surrogate_key(
+        ['recalling_firm','product_description'] 
+     ) }} as product_sk
     ,cast(product_description as string) as product_description
     ,cast(code_info as string) as product_code_info
     ,cast(address_1 as string) as address_line_1

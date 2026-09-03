@@ -18,3 +18,6 @@ models:
 
       - name: affected_amount_unit_type
         description: "{{ doc('column_affected_amount_unit_type') }}"
+
+      - name: product_sk
+        description: "{{ doc('column_product_sk') }}"        
