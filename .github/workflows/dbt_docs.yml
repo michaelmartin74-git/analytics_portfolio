@@ -34,6 +34,23 @@ jobs:
       - name: Install dbt Dependencies
         run: dbt deps
 
+      - name: Create Minimal dbt Profile
+        run: |
+          mkdir -p ~/.dbt
+          cat <<EOF > ~/.dbt/profiles.yml
+          analytics_portfolio:
+            outputs:
+              dev:
+                type: bigquery  # Replace with your adapter (e.g., snowflake, postgres)
+                method: service-account
+                project: dummy-project
+                dataset: dummy_dataset
+            target: dev
+          EOF
+
+      - name: Generate dbt Docs
+        run: dbt docs generate --static --empty-catalog
+
       - name: Generate dbt Docs
         run: dbt docs generate --static
 
