@@ -1,0 +1,83 @@
+version: 2
+
+models:
+  - name: agg_fda__food_enforcements
+    description: "Fact model for FDA food enforcement enriched with recall reason categories."
+    columns:
+      - name: report_date_sk
+        description: "{{ doc('column_report_date') }}"
+
+      - name: class
+        description: "{{ doc('column_classification') }}"
+
+      - name: geo_city
+        description: "{{ doc('column_city') }}"
+
+      - name: geo_state
+        description: "{{ doc('column_state') }}"
+
+      - name: geo_country
+        description: "{{ doc('column_country') }}"
+
+      - name: postal_code
+        description: "{{ doc('column_postal_code') }}"
+
+      - name: zip_county
+        description: "{{ doc('column_zip_county') }}"
+
+      - name: zip_state
+        description: "{{ doc('column_zip_state') }}"
+
+      - name: zip_state_county_fips
+        description: "{{ doc('column_state_county_fips') }}"
+
+      - name: zip_class_fips
+        description: "{{ doc('column_class_fips') }}"
+
+      - name: recall_count
+        description: "Distinct count of recall SKUs."
+
+      - name: event_count
+        description: "Distinct count of recall events."
+
+      - name: affected_skus
+        description: "Distinct count of product SKUs affected."
+
+      - name: recalling_firm
+        description: "{{ doc('column_recalling_firm') }}"
+
+      - name: voluntary_mandated
+        description: "{{ doc('column_voluntary_mandated') }}"
+
+      - name: initial_notification
+        description: "{{ doc('column_initial_firm_notification') }}"
+
+      - name: status
+        description: "{{ doc('column_status') }}"
+
+      - name: product_type
+        description: "{{ doc('column_product_type') }}"
+
+      - name: affected_amount
+        description: "Total sum of affected product units."
+
+      - name: init_to_class_days
+        description: "Sum of days between recall initiation and FDA classification."
+
+      - name: class_to_term_days
+        description: "Sum of days between FDA classification and recall termination."
+
+      - name: init_to_term_days
+        description: "Sum of days between recall initiation and recall termination."
+
+      - name: avg_init_to_class_days
+        description: "Average days between recall initiation and FDA classification."
+
+      - name: avg_class_to_term_days
+        description: "Average days between FDA classification and recall termination."
+
+      - name: avg_init_to_term_days
+        description: "Average days between recall initiation and recall termination."
+
+      - name: reason_category
+        description: "{{ doc('column_reason_category') }}"

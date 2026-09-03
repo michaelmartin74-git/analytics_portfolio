@@ -132,3 +132,7 @@ Recall certification date codified into a surrogate key equivalent.
 {% docs column_termination_date_sk %}
 Recall termination date codified into a surrogate key equivalent.
 {% enddocs %}
+
+{% docs column_product_sk %}
+Surrogate key for unique product description by firm. Proxy for SKU.
+{% enddocs %}

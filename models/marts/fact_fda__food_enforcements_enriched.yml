@@ -49,6 +49,9 @@ models:
       - name: geo_country
         description: "{{ doc('column_country') }}"
 
+      - name: product_sk
+        description: "{{ doc('column_product_sk') }}" 
+
       - name: product_description
         description: "{{ doc('column_product_description') }}"
 
@@ -87,9 +90,3 @@ models:
 
       - name: zip_state
         description: "{{ doc('column_zip_state') }}"
-
-      - name: zip_state_county_fips
-        description: "{{ doc('column_state_county_fips') }}"
-
-      - name: zip_class_fips
-        description: "{{ doc('column_class_fips') }}"
