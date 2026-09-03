@@ -29,7 +29,7 @@ jobs:
       - name: Install dbt and Adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core dbt-bigquery  # Replace dbt-bigquery with your adapter
+          pip install dbt-core dbt-bigquery
 
       - name: Install dbt Dependencies
         run: dbt deps
@@ -41,8 +41,8 @@ jobs:
           analytics_portfolio:
             outputs:
               dev:
-                type: bigquery  # Replace with your adapter (e.g., snowflake, postgres)
-                method: service-account
+                type: bigquery
+                method: oauth
                 project: dummy-project
                 dataset: dummy_dataset
             target: dev
@@ -50,9 +50,6 @@ jobs:
 
       - name: Generate dbt Docs
         run: dbt docs generate --static --empty-catalog
-
-      - name: Generate dbt Docs
-        run: dbt docs generate --static
 
       - name: Rename Static File for Pages
         run: |
