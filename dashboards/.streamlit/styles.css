@@ -1,0 +1,77 @@
+/* Sidebar Filter Toggle Section */
+section[data-testid="stSidebar"] {
+    background-color: #F8FAFC;
+}
+
+/* Base Typography Controls */
+.app-title {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px !important;
+    color: #0F172A;
+}
+
+.app-subtitle {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em;
+    color: #64748B;
+    margin-bottom: 16px !important;
+}
+
+/* KPI Card Typography */
+.kpi-title {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 0px !important;
+    line-height: 1 !important;
+}
+
+.kpi-value {
+    font-size: 22px !important;
+    font-weight: 500 !important;
+    color: #0F172A;
+    margin: 2px 0px !important;
+    line-height: 1.1 !important;
+}
+
+.kpi-timeframe {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    color: #94A3B8;
+    margin-top: 0px !important;
+    line-height: 1 !important;
+}
+
+/* Footer Styling */
+.app-footer {
+    font-size: 10px;
+    color: #94A3B8;
+    border-top: 1px solid #E2E8F0;
+    padding-top: 8px;
+    margin-top: 24px;
+}
+
+---
+
+/* Remove default vertical gaps inside Streamlit columns containing KPI components */
+[data-testid="stColumn"] > div {
+    gap: 0rem !important;
+}
+
+/* Tighten Plotly chart container margins and pull chart left */
+[data-testid="stPlotlyChart"] {
+    margin-top: 0px !important;
+    margin-bottom: 0px !important;
+    padding-top: 0px !important;
+}
+
+/* Vertical alignment centering for column layout */
+[data-testid="stHorizontalBlock"] {
+    align-items: center !important;
+}
