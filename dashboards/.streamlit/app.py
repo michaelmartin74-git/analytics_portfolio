@@ -56,7 +56,7 @@ st.set_page_config(layout="wide", page_title="Executive Dashboard Template")
 # 2. Mock Data Generator
 @st.cache_data
 def load_data():
-    dates = pd.date_range(start="2024-01-01", end="2026-08-31", freq="M")
+    dates = pd.date_range(start="2024-01-01", end="2026-08-31", freq="ME")
     np.random.seed(42)
     segments = ["North America", "EMEA", "APAC", "LATAM"]
     
