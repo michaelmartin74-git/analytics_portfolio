@@ -10,7 +10,7 @@ from pathlib import Path
 APP_DIR = Path(__file__).resolve().parent      # my_dbt_project/dashboards
 CSS_PATH = APP_DIR / "styles.css"     
 PROJECT_ROOT = APP_DIR.parent.parent                   # my_dbt_project
-SCRIPTS_DIR = PROJECT_ROOT / "scripts"
+SCRIPTS_DIR = PROJECT_ROOT / "Scripts"
 
 @st.cache_data(ttl="1d")
 def load_all_data() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
