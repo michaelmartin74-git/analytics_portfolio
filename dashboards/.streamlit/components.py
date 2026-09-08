@@ -191,60 +191,12 @@ def render_trend_chart(df: pd.DataFrame, metric_col: str, start_date, end_date):
         selection_mode="points",
         key="trend_chart_selection"
     )
+        
 
-    # Extract clicked point date into session_state
-    if selected_data and selected_data.get("selection") and selected_data["selection"]["points"]:
-        point = selected_data["selection"]["points"][0]
-        st.session_state['selected_chart_date'] = point['x']
+    # One-liner state sync: extracts point X value or sets None
+    points = selected_data.get("selection", {}).get("points", []) if selected_data else []
+    st.session_state['selected_chart_date'] = points[0]['x'] if points else None
     
-
-# def render_segmented_table(df: pd.DataFrame, metric_col: str, start_date, end_date):
-#     """Renders a Year x Month pivot table for the selected metric."""
-#     if df.empty or metric_col not in df.columns:
-#         return
-
-#     # Filter by date range
-#     df = df.copy()
-#     df['date'] = pd.to_datetime(df['date'], errors='coerce')
-    
-#     start_dt = pd.to_datetime(start_date)
-#     end_dt = pd.to_datetime(end_date)
-#     filtered_df = df[(df['date'] >= start_dt) & (df['date'] <= end_dt)].copy()
-
-#     if filtered_df.empty:
-#         st.warning("No data available for the selected timeframe.")
-#         return
-
-#     # Extract Year and Month (ordered chronologically)
-#     filtered_df['Year'] = filtered_df['date'].dt.year
-#     filtered_df['Month'] = filtered_df['date'].dt.strftime('%b')
-#     filtered_df['month_num'] = filtered_df['date'].dt.month
-
-#     # Determine aggregation logic matching trend chart
-#     agg_func = 'mean' if 'avg' in metric_col else 'sum'
-
-#     # Build Year (rows) x Month (columns) Pivot
-#     pivot_df = filtered_df.pivot_table(
-#         index='Year',
-#         columns=['month_num', 'Month'],
-#         values=metric_col,
-#         aggfunc=agg_func,
-#         fill_value=0
-#     )
-
-#     # Sort and drop month_num helper from column multi-index
-#     pivot_df = pivot_df.sort_index(axis=1, level=0)
-#     pivot_df.columns = pivot_df.columns.get_level_values('Month')
-
-#     # Formatting string based on metric type
-#     fmt = "{:,.1f}" if agg_func == 'mean' else "{:,.0f}"
-
-#     st.dataframe(
-#         pivot_df.style.format(fmt), 
-#         use_container_width=True, 
-#         height=300
-#     )
-
 
 def render_segmented_table(df: pd.DataFrame, metric_col: str, start_date, end_date):
     """Renders a Year x Month crosstab showing all data, highlighting the selected timeframe,
@@ -343,6 +295,11 @@ def render_segmented_table(df: pd.DataFrame, metric_col: str, start_date, end_da
     )
 
 
+def clear_selection():
+    st.session_state.pop("selected_chart_date", None)
+    st.session_state.pop("trend_chart_selection", None)
+
+
 def render_drilldown_table(df: pd.DataFrame):
     """Renders line-item records matching the clicked chart point."""
     clicked_date_str = st.session_state.get('selected_chart_date')
@@ -353,48 +310,36 @@ def render_drilldown_table(df: pd.DataFrame):
 
     df = df.copy()
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
-    
     clicked_dt = pd.to_datetime(clicked_date_str)
     
-    # Filter for full month of the clicked point
-    month_mask = (df['date'].dt.year == clicked_dt.year) & (df['date'].dt.month == clicked_dt.month)
-    drill_df = df[month_mask].copy()
+    drill_df = df[
+        (df['date'].dt.year == clicked_dt.year) & 
+        (df['date'].dt.month == clicked_dt.month)
+    ].copy()
 
-    # Clear Selection Header Button
+    # Clear Selection Header
     col_title, col_btn = st.columns([4, 1])
-    with col_title:
-        st.caption(f"DRILL-DOWN RECORDS: {clicked_dt.strftime('%B %Y')} ({len(drill_df):,} records)")
-    with col_btn:
-        #if st.button("Clear Selection", size="small"):
-        if st.button("Clear Selection", use_container_width=True):
-            st.session_state['selected_chart_date'] = None
-            st.rerun()
+    col_title.caption(f"DRILL-DOWN RECORDS: {clicked_dt.strftime('%B %Y')} ({len(drill_df):,} records)")
+    col_btn.button("Clear Selection", use_container_width=True, on_click=clear_selection)
 
     if drill_df.empty:
         st.warning("No line-item detail found for this timeframe.")
         return
 
-    # Select and format base-level fields (adjust list to match your actual schema)
     display_cols = [
-        col for col in [
-            'date', 'recalling_firm','class',
-            'reason_category','status','voluntary_mandated',
-            'geo_state','geo_city','geo_country','recalls',
-            'skus','avg_init_to_class_days',
-            'avg_class_to_term_days','avg_init_to_term_days'
-            ] 
-        if col in drill_df.columns
+        c for c in [
+            'date', 'recalling_firm', 'class', 'reason_category', 'status', 
+            'voluntary_mandated', 'geo_state', 'geo_city', 'geo_country', 
+            'recalls', 'skus', 'avg_init_to_class_days', 
+            'avg_class_to_term_days', 'avg_init_to_term_days'
+        ] if c in drill_df.columns
     ]
     
     drill_display = drill_df[display_cols].sort_values('date', ascending=False)
-    
-    # Format date column for display
     if 'date' in drill_display.columns:
         drill_display['date'] = drill_display['date'].dt.strftime('%Y-%m-%d')
 
-    st.dataframe(
-        drill_display,
-        use_container_width=True,
-        height=300,
-        hide_index=True
-    )
+    st.dataframe(drill_display, use_container_width=True, height=300, hide_index=True)
+
+    
+    
