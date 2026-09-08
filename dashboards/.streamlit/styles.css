@@ -22,6 +22,11 @@ section[data-testid="stSidebar"] {
     margin-bottom: 16px !important;
 }
 
+.subtitle-qualifier {
+    font-weight: 350 !important;
+    color: #94A3B8 !important; /* Optional: drops contrast slightly to match kpi-timeframe */
+}
+
 /* KPI Card Typography */
 .kpi-title {
     font-size: 11px !important;
