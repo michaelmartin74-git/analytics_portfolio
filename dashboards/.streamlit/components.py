@@ -33,10 +33,20 @@ def render_kpi_sparkline(df: pd.DataFrame, metric_col: str, title: str, start_da
 
     col_text, col_chart = st.columns([1, 2], gap="small")
 
+    # with col_text:
+    #     st.markdown(f'<div class="kpi-title">{title}</div>', unsafe_allow_html=True)
+    #     st.markdown(f'<div class="kpi-value">{current_val:,.0f}</div>', unsafe_allow_html=True)
+    #     st.markdown(f'<div class="kpi-timeframe">{timeframe_str}</div>', unsafe_allow_html=True)
+    
     with col_text:
-        st.markdown(f'<div class="kpi-title">{title}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="kpi-value">{current_val:,.0f}</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="kpi-timeframe">{timeframe_str}</div>', unsafe_allow_html=True)
+        kpi_html = f"""
+        <div class="kpi-card-content">
+            <div class="kpi-title">{title}</div>
+            <div class="kpi-value">{current_val:,.0f}</div>
+            <div class="kpi-timeframe">{timeframe_str}</div>
+        </div>
+        """
+        st.markdown(kpi_html, unsafe_allow_html=True)
 
     with col_chart:
         fig = go.Figure()
@@ -170,53 +180,221 @@ def render_trend_chart(df: pd.DataFrame, metric_col: str, start_date, end_date):
         )
     )
 
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    #st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    
+    # Capture chart selection events
+    selected_data = st.plotly_chart(
+        fig, 
+        use_container_width=True, 
+        config={'displayModeBar': False},
+        on_select="rerun",
+        selection_mode="points",
+        key="trend_chart_selection"
+    )
+
+    # Extract clicked point date into session_state
+    if selected_data and selected_data.get("selection") and selected_data["selection"]["points"]:
+        point = selected_data["selection"]["points"][0]
+        st.session_state['selected_chart_date'] = point['x']
     
 
+# def render_segmented_table(df: pd.DataFrame, metric_col: str, start_date, end_date):
+#     """Renders a Year x Month pivot table for the selected metric."""
+#     if df.empty or metric_col not in df.columns:
+#         return
+
+#     # Filter by date range
+#     df = df.copy()
+#     df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    
+#     start_dt = pd.to_datetime(start_date)
+#     end_dt = pd.to_datetime(end_date)
+#     filtered_df = df[(df['date'] >= start_dt) & (df['date'] <= end_dt)].copy()
+
+#     if filtered_df.empty:
+#         st.warning("No data available for the selected timeframe.")
+#         return
+
+#     # Extract Year and Month (ordered chronologically)
+#     filtered_df['Year'] = filtered_df['date'].dt.year
+#     filtered_df['Month'] = filtered_df['date'].dt.strftime('%b')
+#     filtered_df['month_num'] = filtered_df['date'].dt.month
+
+#     # Determine aggregation logic matching trend chart
+#     agg_func = 'mean' if 'avg' in metric_col else 'sum'
+
+#     # Build Year (rows) x Month (columns) Pivot
+#     pivot_df = filtered_df.pivot_table(
+#         index='Year',
+#         columns=['month_num', 'Month'],
+#         values=metric_col,
+#         aggfunc=agg_func,
+#         fill_value=0
+#     )
+
+#     # Sort and drop month_num helper from column multi-index
+#     pivot_df = pivot_df.sort_index(axis=1, level=0)
+#     pivot_df.columns = pivot_df.columns.get_level_values('Month')
+
+#     # Formatting string based on metric type
+#     fmt = "{:,.1f}" if agg_func == 'mean' else "{:,.0f}"
+
+#     st.dataframe(
+#         pivot_df.style.format(fmt), 
+#         use_container_width=True, 
+#         height=300
+#     )
+
+
 def render_segmented_table(df: pd.DataFrame, metric_col: str, start_date, end_date):
-    """Renders a Year x Month pivot table for the selected metric."""
-    if df.empty or metric_col not in df.columns:
+    """Renders a Year x Month crosstab showing all data, highlighting the selected timeframe,
+
+    with a toggle for Total vs. Monthly Growth.
+    """
+    if df.empty or metric_col not in df.columns or 'date' not in df.columns:
         return
 
-    # Filter by date range
+    df = df.copy()
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    df = df.dropna(subset=['date'])
+
+    # 1. UI Toggle for view type
+    view_mode = st.radio(
+        "Metric View",
+        ["Total", "Monthly Growth"],
+        horizontal=True,
+        key=f"view_mode_{metric_col}"
+    )
+
+    # 2. Extract temporal metadata on full dataset
+    df['Year'] = df['date'].dt.year
+    df['Month'] = df['date'].dt.strftime('%b')
+    df['month_num'] = df['date'].dt.month
+
+    agg_func = 'mean' if 'avg' in metric_col else 'sum'
+
+# 3. Build chronological 1D monthly series for continuous pct_change
+    # Group by explicit Year + month_num to guarantee chronological sorting
+    df['YearMonth'] = df['date'].dt.to_period('M')
+    monthly_series = df.groupby('YearMonth')[metric_col].agg(agg_func).sort_index()
+
+    if view_mode == "Monthly Growth":
+        # Calculate MoM growth across continuous chronological months (Dec -> Jan works correctly)
+        calc_series = monthly_series.pct_change()
+        fmt = "{:+.1%}"
+    else:
+        calc_series = monthly_series
+        fmt = "{:,.1f}" if agg_func == 'mean' else "{:,.0f}"
+
+    # 4. Reshape calculated series back into Year x Month Pivot
+    calc_df = calc_series.to_frame(name='val')
+    calc_df['Year'] = calc_df.index.year
+    calc_df['month_num'] = calc_df.index.month
+    calc_df['Month'] = calc_df.index.strftime('%b')
+
+    display_df = (
+        calc_df.pivot_table(
+            index='Year',
+            columns=['month_num', 'Month'],
+            values='val',
+            aggfunc='first'
+        )
+        .sort_index(axis=1, level=0)                # Jan -> Dec
+        .sort_index(axis=0, ascending=False)        # 2026 -> 2025 (Descending Year)
+    )
+    display_df.columns = display_df.columns.get_level_values('Month')
+
+    # 5. Build Highlight Mask for selected date range
+    start_dt = pd.to_datetime(start_date)
+    end_dt = pd.to_datetime(end_date)
+
+    # Create a boolean DataFrame matching display_df shape
+    highlight_mask = pd.DataFrame(False, index=display_df.index, columns=display_df.columns)
+    
+    # Month name to number map for validation
+    month_map = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6, 
+                 'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
+
+    for year in display_df.index:
+        for month_str in display_df.columns:
+            m_num = month_map.get(month_str)
+            if m_num:
+                # Cell timestamp set to first day of the cell's month
+                cell_dt = pd.Timestamp(year=year, month=m_num, day=1)
+                # Check overlap with start/end bounds (month resolution)
+                if (cell_dt >= start_dt.replace(day=1)) and (cell_dt <= end_dt):
+                    highlight_mask.loc[year, month_str] = True
+
+    # 6. Apply Conditional Formatting
+    def apply_highlights(data):
+        return pd.DataFrame(
+            where(highlight_mask, 'background-color: #1e3a8a; color: #ffffff;', ''),
+            index=data.index,
+            columns=data.columns
+        )
+
+    from numpy import where
+    styled_df = display_df.style.apply(apply_highlights, axis=None).format(fmt, na_rep="-")
+
+    st.dataframe(
+        styled_df, 
+        use_container_width=True, 
+        height=350
+    )
+
+
+def render_drilldown_table(df: pd.DataFrame):
+    """Renders line-item records matching the clicked chart point."""
+    clicked_date_str = st.session_state.get('selected_chart_date')
+
+    if not clicked_date_str:
+        st.info("Click any data point on the trend chart above to inspect underlying row records for that month.")
+        return
+
     df = df.copy()
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
     
-    start_dt = pd.to_datetime(start_date)
-    end_dt = pd.to_datetime(end_date)
-    filtered_df = df[(df['date'] >= start_dt) & (df['date'] <= end_dt)].copy()
+    clicked_dt = pd.to_datetime(clicked_date_str)
+    
+    # Filter for full month of the clicked point
+    month_mask = (df['date'].dt.year == clicked_dt.year) & (df['date'].dt.month == clicked_dt.month)
+    drill_df = df[month_mask].copy()
 
-    if filtered_df.empty:
-        st.warning("No data available for the selected timeframe.")
+    # Clear Selection Header Button
+    col_title, col_btn = st.columns([4, 1])
+    with col_title:
+        st.caption(f"DRILL-DOWN RECORDS: {clicked_dt.strftime('%B %Y')} ({len(drill_df):,} records)")
+    with col_btn:
+        #if st.button("Clear Selection", size="small"):
+        if st.button("Clear Selection", use_container_width=True):
+            st.session_state['selected_chart_date'] = None
+            st.rerun()
+
+    if drill_df.empty:
+        st.warning("No line-item detail found for this timeframe.")
         return
 
-    # Extract Year and Month (ordered chronologically)
-    filtered_df['Year'] = filtered_df['date'].dt.year
-    filtered_df['Month'] = filtered_df['date'].dt.strftime('%b')
-    filtered_df['month_num'] = filtered_df['date'].dt.month
-
-    # Determine aggregation logic matching trend chart
-    agg_func = 'mean' if 'avg' in metric_col else 'sum'
-
-    # Build Year (rows) x Month (columns) Pivot
-    pivot_df = filtered_df.pivot_table(
-        index='Year',
-        columns=['month_num', 'Month'],
-        values=metric_col,
-        aggfunc=agg_func,
-        fill_value=0
-    )
-
-    # Sort and drop month_num helper from column multi-index
-    pivot_df = pivot_df.sort_index(axis=1, level=0)
-    pivot_df.columns = pivot_df.columns.get_level_values('Month')
-
-    # Formatting string based on metric type
-    fmt = "{:,.1f}" if agg_func == 'mean' else "{:,.0f}"
+    # Select and format base-level fields (adjust list to match your actual schema)
+    display_cols = [
+        col for col in [
+            'date', 'recalling_firm','class',
+            'reason_category','status','voluntary_mandated',
+            'geo_state','geo_city','geo_country','recalls',
+            'skus','avg_init_to_class_days',
+            'avg_class_to_term_days','avg_init_to_term_days'
+            ] 
+        if col in drill_df.columns
+    ]
+    
+    drill_display = drill_df[display_cols].sort_values('date', ascending=False)
+    
+    # Format date column for display
+    if 'date' in drill_display.columns:
+        drill_display['date'] = drill_display['date'].dt.strftime('%Y-%m-%d')
 
     st.dataframe(
-        pivot_df.style.format(fmt), 
-        use_container_width=True, 
-        height=300
+        drill_display,
+        use_container_width=True,
+        height=300,
+        hide_index=True
     )
-    

@@ -28,29 +28,33 @@ section[data-testid="stSidebar"] {
 }
 
 /* KPI Card Typography */
+
+.kpi-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+}
+
 .kpi-title {
-    font-size: 11px !important;
-    font-weight: 400 !important;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-transform: uppercase;
-    color: #475569;
-    margin-bottom: 0px !important;
-    line-height: 1 !important;
+    color: #64748B;
+    line-height: 1.2;
 }
 
 .kpi-value {
-    font-size: 22px !important;
-    font-weight: 500 !important;
+    font-size: 1.5rem;
+    font-weight: 500;
     color: #0F172A;
-    margin: 2px 0px !important;
-    line-height: 1.1 !important;
+    line-height: 1.1;
 }
 
 .kpi-timeframe {
-    font-size: 11px !important;
-    font-weight: 400 !important;
+    font-size: 0.70rem;
     color: #94A3B8;
-    margin-top: 0px !important;
-    line-height: 1 !important;
+    line-height: 1.2;
 }
 
 /* Footer Styling */
@@ -61,8 +65,6 @@ section[data-testid="stSidebar"] {
     padding-top: 8px;
     margin-top: 24px;
 }
-
----
 
 /* Remove default vertical gaps inside Streamlit columns containing KPI components */
 [data-testid="stColumn"] > div {

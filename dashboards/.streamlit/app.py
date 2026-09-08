@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 import streamlit as st
-from components import render_kpi_sparkline, render_trend_chart, render_segmented_table
+from components import render_kpi_sparkline, render_trend_chart, render_segmented_table, render_drilldown_table
 from pathlib import Path
 import duckdb 
 
@@ -211,12 +211,22 @@ with st.container():
 
 st.divider()
 
-# Container 3: Crosstab of Year x Month Values (55% Vertical Section)
+
+# Container 3: Crosstab of Recall Details
+with st.container():
+    render_drilldown_table(df)
+
+    
+st.divider()
+
+
+# Container 4: Crosstab of Year x Month Values (55% Vertical Section)
 with st.container():
     st.caption("YEAR OVER MONTH MATRIX")
     
     # Pass selected_metric into the table component
     render_segmented_table(df, selected_metric, start_date, end_date)    
+
 
 # 7. Dashboard Footer
 last_refresh = df['date'].max().strftime('%Y-%m-%d')
