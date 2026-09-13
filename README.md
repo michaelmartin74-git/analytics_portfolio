@@ -5,6 +5,7 @@ This repository contains public dbt projects built against public datasets. It i
 ## What's Included
 * **Data Sources:** Public datasets hosted on [BigQuery / Snowflake / etc.]
 * **Core Patterns:** [e.g., Staging/Intermediate/Marts layer architecture, custom macros, data tests, documentation]
+* **Streamlit App:** Transformed data served via [Streamlit](https://analyticsportfolio-tzkv83oktxw3hzmcyqkpck.streamlit.app/)
 
 ## Quickstart
 
