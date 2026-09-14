@@ -114,7 +114,7 @@ df = get_unified_analytics_frame(df_agg_recalls, df_date)
 if CSS_PATH.exists():
     with open(CSS_PATH) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
+        
 
 # ==============================================================================
 # 4. SIDEBAR & INTERACTIVE FILTERS
@@ -128,16 +128,31 @@ def _resolve_bounds(df_subset: pd.DataFrame) -> tuple[datetime.date, datetime.da
         return min_data_date, max_data_date
     return df_subset['date'].min().date(), df_subset['date'].max().date()
 
+# Callback to clear all filters back to default values
+def reset_filters():
+    st.session_state["preset"] = "Current Year"
+    st.session_state["custom_dates"] = (min_data_date, max_data_date)
+    for col in DIMENSION_FILTERS:
+        st.session_state[f"filter_{col}"] = "All"
+
+# Initialize state keys prior to rendering UI elements
+if "preset" not in st.session_state:
+    st.session_state["preset"] = "Current Year"
+
+for col in DIMENSION_FILTERS:
+    if f"filter_{col}" not in st.session_state:
+        st.session_state[f"filter_{col}"] = "All"
 
 selected_filters = {}
 
 with st.sidebar:
     st.subheader("Filters")
-    
+    st.button("Clear Filters", on_click=reset_filters, type="secondary")
+
     preset = st.selectbox(
         "Date Range Preset",
         options=["Last Month", "Last 6 Months", "Current Year", "Last Year", "Custom", "All Time"],
-        index=2
+        key="preset"
     )
 
     if preset == "Last Month":
@@ -156,7 +171,8 @@ with st.sidebar:
             "Select Dates",
             value=(default_start, max_data_date),
             min_value=min_data_date,
-            max_value=max_data_date
+            max_value=max_data_date,
+            key="custom_dates"
         )
         if isinstance(date_range, tuple) and len(date_range) == 2:
             start_date, end_date = date_range
@@ -168,14 +184,37 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("Dimension Filters")
     
+    # Baseline date-filtered slice used as foundation for dimension options
+    base_df = df[
+        (df['date'].dt.date >= start_date) & 
+        (df['date'].dt.date <= end_date)
+    ]
+
+    # Capture current session state values for evaluation
+    active_selections = {col: st.session_state[f"filter_{col}"] for col in DIMENSION_FILTERS}
+
+    # Render each selectbox dynamically using an "all-but-self" subset
     for col in DIMENSION_FILTERS:
-        options = ["All"] + sorted(df[col].dropna().unique().tolist())
-        selected_filters[col] = st.selectbox(
+        # Filter base dataset against all ACTIVE selections EXCEPT the current column
+        subset_df = base_df.copy()
+        for other_col, sel_val in active_selections.items():
+            if other_col != col and sel_val != "All":
+                subset_df = subset_df[subset_df[other_col] == sel_val]
+
+        # Extract relevant unique values remaining in this specific cross-section
+        available_options = ["All"] + sorted(subset_df[col].dropna().unique().tolist())
+        
+        # Reset to "All" if current selection became invalid due to cross-filtering choices
+        if st.session_state[f"filter_{col}"] not in available_options:
+            st.session_state[f"filter_{col}"] = "All"
+
+        selected_val = st.selectbox(
             col.replace("_", " ").title(),
-            options=options,
-            index=0,
+            options=available_options,
             key=f"filter_{col}"
         )
+        
+        selected_filters[col] = selected_val
 
 
 # ==============================================================================

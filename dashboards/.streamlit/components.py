@@ -160,6 +160,7 @@ def render_trend_chart(
     custom_hovertemplate = "<b>%{x|%b %d, %Y}</b>: %{y:,.0f}<extra></extra>"
 
     # Suppress baseline hover whenever point is inside active range
+    # Note: prevents two tooltips for point on both gray and blue lines
     baseline_hover_control = [
         "none" if (start_dt <= d <= end_dt) else "all" 
         for d in df_chart_full['date']
