@@ -21,16 +21,16 @@ st.set_page_config(layout="wide", page_title="Dashboard Template")
 APP_DIR = Path(__file__).resolve().parent
 
 def get_project_root(starting_dir: Path) -> Path:
-    """Traverse upwards until the directory containing 'Scripts' is located."""
+    """Traverse upwards until the directory containing 'scripts' is located."""
     for parent in [starting_dir] + list(starting_dir.parents):
-        if (parent / "Scripts").is_dir():
+        if (parent / "scripts").is_dir():
             return parent
     # Fallback to standard 2-level parent if not found
     return starting_dir.parent.parent
 
 CSS_PATH = APP_DIR / "styles.css"
 PROJECT_ROOT = APP_DIR.parent.parent
-SCRIPTS_DIR = PROJECT_ROOT / "Scripts"
+SCRIPTS_DIR = PROJECT_ROOT / "scripts"
 
 DIMENSION_FILTERS = [
     "class", "status", "reason_category", 
