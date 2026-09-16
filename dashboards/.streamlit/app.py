@@ -19,6 +19,15 @@ from components import (
 st.set_page_config(layout="wide", page_title="Dashboard Template")
 
 APP_DIR = Path(__file__).resolve().parent
+
+def get_project_root(starting_dir: Path) -> Path:
+    """Traverse upwards until the directory containing 'Scripts' is located."""
+    for parent in [starting_dir] + list(starting_dir.parents):
+        if (parent / "Scripts").is_dir():
+            return parent
+    # Fallback to standard 2-level parent if not found
+    return starting_dir.parent.parent
+
 CSS_PATH = APP_DIR / "styles.css"
 PROJECT_ROOT = APP_DIR.parent.parent
 SCRIPTS_DIR = PROJECT_ROOT / "Scripts"
@@ -49,9 +58,8 @@ def load_raw_datasets() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     for filename in files:
         path = SCRIPTS_DIR / filename
         if not path.exists():
-            st.error(f"File not found: {path}")
-            dfs.append(pd.DataFrame())
-            continue
+            st.error(f"Missing required data file at path: `{path}`")
+            st.stop()
             
         table = pq.read_table(path)
         existing_metadata = table.schema.metadata or {}
