@@ -218,9 +218,9 @@ useEffect(() => {
         style={{
           position: 'absolute',
           top: '25px',
-          left: '10px',
+          left: '5px',
           zIndex: 10,
-          padding: '5px 5px',
+          padding: '3px 3px',
           backgroundColor: '#FFFFFF',
           border: '1px solid #CBD5E1',
           borderRadius: '4px',
@@ -228,7 +228,7 @@ useEffect(() => {
           fontSize: '0.85rem',
         }}
       >
-        {isSidebarOpen ? '✕' : '☰'}
+        {isSidebarOpen ? '✕' : "⚙️"}
       </button>
       
       {/* Conditional Sidebar */}
