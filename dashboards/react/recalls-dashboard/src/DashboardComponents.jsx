@@ -1,482 +1,3 @@
-// // import React, { useState, useMemo } from 'react';
-// // import Plotly from 'plotly.js-dist-min';
-// // import createPlotlyComponent from 'react-plotly.js/factory';
-
-// // // Handle CommonJS/ESM interop quirks in Vite
-// // const PlotlyLib = Plotly.purge ? Plotly : Plotly.default || Plotly;
-// // const Plot = createPlotlyComponent(React, PlotlyLib);
-
-// //import React, { useState, useMemo } from 'react';
-// import React, { useState, useMemo, lazy, Suspense } from 'react';
-
-// // 1. Dynamically resolve Plotly before building the component wrapper
-// const PlotlyComponent = lazy(async () => {
-//   const [ReactModule, PlotlyModule, FactoryModule] = await Promise.all([
-//     import('react'),
-//     import('plotly.js-dist-min'),
-//     import('react-plotly.js/factory'),
-//   ]);
-
-//   const ReactLib = ReactModule.default || ReactModule;
-//   const createPlotComponent = FactoryModule.default || FactoryModule;
-
-//   let PlotlyObj = PlotlyModule.default || PlotlyModule;
-//   if (PlotlyObj.default && typeof PlotlyObj.default.purge === 'function') {
-//     PlotlyObj = PlotlyObj.default;
-//   }
-
-//   return {
-//     default: createPlotComponent(ReactLib, PlotlyObj),
-//   };
-// });
-
-// // 2. Define the unified Plot component used across KpiSparkline & TrendChart
-// const Plot = (props) => (
-//   <Suspense fallback={<div style={{ height: props.layout?.height || 200 }} />}>
-//     <PlotlyComponent {...props} />
-//   </Suspense>
-// );
-
-// // ==============================================================================
-// // HELPER UTILITIES
-// // ==============================================================================
-// // ==============================================================================
-// // HELPER UTILITIES (JS Equivalents of pandas Data Processing)
-// // ==============================================================================
-
-// function prepareTimeSeries(data, metricCol) {
-//   if (!data || data.length === 0) return [];
-
-//   const isAvg = metricCol.includes('avg');
-//   const aggregated = {};
-
-//   data.forEach((row) => {
-//     if (!row.date || row[metricCol] == null) return;
-//     const dateStr = new Date(row.date).toISOString().split('T')[0];
-
-//     if (!aggregated[dateStr]) {
-//       aggregated[dateStr] = { sum: 0, count: 0 };
-//     }
-//     aggregated[dateStr].sum += Number(row[metricCol]);
-//     aggregated[dateStr].count += 1;
-//   });
-
-//   return Object.keys(aggregated)
-//     .sort()
-//     .map((dateStr) => ({
-//       date: dateStr,
-//       value: isAvg
-//         ? aggregated[dateStr].sum / aggregated[dateStr].count
-//         : aggregated[dateStr].sum,
-//     }));
-// }
-
-// function formatDate(dateObj, format = 'short') {
-//   if (!dateObj) return '';
-//   const d = new Date(dateObj);
-//   if (format === 'monthYear') {
-//     return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-//   }
-//   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-// }
-
-// // ==============================================================================
-// // PUBLIC RENDERING COMPONENTS
-// // ==============================================================================
-
-// /**
-//  * 1. KPI Sparkline Component
-//  */
-// export function KpiSparkline({
-//   dfFull = [],
-//   dfFiltered = [],
-//   metricCol,
-//   title,
-//   startDate,
-//   endDate,
-// }) {
-//   const chartFull = useMemo(() => prepareTimeSeries(dfFull, metricCol), [dfFull, metricCol]);
-//   const chartHighlight = useMemo(() => prepareTimeSeries(dfFiltered, metricCol), [dfFiltered, metricCol]);
-
-//   const currentValue = useMemo(() => {
-//     if (!dfFiltered || dfFiltered.length === 0) return 0;
-//     const isAvg = metricCol.includes('avg');
-//     const total = dfFiltered.reduce((sum, row) => sum + (Number(row[metricCol]) || 0), 0);
-//     return isAvg ? total / dfFiltered.length : total;
-//   }, [dfFiltered, metricCol]);
-
-//   const timeframeStr = `${formatDate(startDate, 'monthYear')} - ${formatDate(endDate, 'monthYear')}`;
-
-//   const customHoverTemplate = '<b>%{x}</b>: %{y:,.0f}<extra></extra>';
-
-//   return (
-//     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontFamily: 'sans-serif' }}>
-//       {/* KPI Text Column */}
-//       <div style={{ flex: '1' }}>
-//         <div style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: 600 }}>{title}</div>
-//         <div style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A' }}>
-//           {currentValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-//         </div>
-//         <div style={{ fontSize: '0.75rem', color: '#94A3B8' }}>{timeframeStr}</div>
-//       </div>
-
-//       {/* Sparkline Chart Column */}
-//       <div style={{ flex: '2', height: '40px' }}>
-//         <Plot
-//           data={[
-//             {
-//               x: chartFull.map((d) => d.date),
-//               y: chartFull.map((d) => d.value),
-//               mode: 'lines+markers',
-//               marker: { size: 4, opacity: 0 },
-//               line: { color: '#CBD5E1', width: 1.5 },
-//               hovertemplate: customHoverTemplate,
-//               type: 'scatter',
-//             },
-//             {
-//               x: chartHighlight.map((d) => d.date),
-//               y: chartHighlight.map((d) => d.value),
-//               mode: 'lines+markers',
-//               marker: { size: 4, opacity: 0 },
-//               line: { color: '#2563EB', width: 2.0 },
-//               hovertemplate: customHoverTemplate,
-//               type: 'scatter',
-//             },
-//           ]}
-//           layout={{
-//             margin: { l: 0, r: 0, t: 0, b: 0 },
-//             height: 40,
-//             paper_bgcolor: 'rgba(0,0,0,0)',
-//             plot_bgcolor: 'rgba(0,0,0,0)',
-//             showlegend: false,
-//             xaxis: { visible: false, fixedrange: true },
-//             yaxis: { visible: false, fixedrange: true },
-//             hovermode: 'x',
-//           }}
-//           config={{ displayModeBar: false, responsive: true }}
-//           style={{ width: '100%', height: '100%' }}
-//         />
-//       </div>
-//     </div>
-//   );
-// }
-
-// /**
-//  * 2. Main Trend Line Chart Component
-//  */
-// export function TrendChart({
-//   dfFull = [],
-//   dfFiltered = [],
-//   metricCol,
-//   startDate,
-//   endDate,
-//   onPointSelect,
-// }) {
-//   const chartFull = useMemo(() => prepareTimeSeries(dfFull, metricCol), [dfFull, metricCol]);
-//   const chartHighlight = useMemo(() => prepareTimeSeries(dfFiltered, metricCol), [dfFiltered, metricCol]);
-
-//   const startDt = new Date(startDate);
-//   const endDt = new Date(endDate);
-
-//   const baselineHoverControl = useMemo(() => {
-//     return chartFull.map((d) => {
-//       const dt = new Date(d.date);
-//       return dt >= startDt && dt <= endDt ? 'none' : 'all';
-//     });
-//   }, [chartFull, startDt, endDt]);
-
-//   const handlePlotClick = (event) => {
-//     if (event.points && event.points.length > 0) {
-//       const clickedX = event.points[0].x;
-//       if (onPointSelect) onPointSelect(clickedX);
-//     }
-//   };
-
-//   return (
-//     <div style={{ width: '100%', height: '250px' }}>
-//       <Plot
-//         data={[
-//           {
-//             x: chartFull.map((d) => d.date),
-//             y: chartFull.map((d) => d.value),
-//             mode: 'lines+markers',
-//             marker: { size: 4, opacity: 0 },
-//             line: { color: '#CBD5E1', width: 1.5 },
-//             hovertemplate: '<b>%{x}</b>: %{y:,.0f}<extra></extra>',
-//             hoverinfo: baselineHoverControl,
-//             type: 'scatter',
-//           },
-//           {
-//             x: chartHighlight.map((d) => d.date),
-//             y: chartHighlight.map((d) => d.value),
-//             mode: 'lines+markers',
-//             marker: { size: 4, opacity: 0 },
-//             line: { color: '#2563EB', width: 2.5 },
-//             hovertemplate: '<b>%{x}</b>: %{y:,.0f}<extra></extra>',
-//             type: 'scatter',
-//           },
-//         ]}
-//         layout={{
-//           height: 250,
-//           margin: { l: 40, r: 20, t: 10, b: 30 },
-//           paper_bgcolor: 'rgba(0,0,0,0)',
-//           plot_bgcolor: 'rgba(0,0,0,0)',
-//           showlegend: false,
-//           xaxis: { type: 'date', showgrid: false },
-//           yaxis: { showgrid: true, gridcolor: '#E2E8F0' },
-//         }}
-//         config={{ displayModeBar: false, responsive: true }}
-//         onClick={handlePlotClick}
-//         style={{ width: '100%', height: '100%' }}
-//       />
-//     </div>
-//   );
-// }
-
-// /**
-//  * 3. Segmented Crosstab / Pivot Table Component
-//  */
-// export function SegmentedTable({ dfFull = [], metricCol, startDate, endDate }) {
-//   const [viewMode, setViewMode] = useState('Total');
-
-//   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-//   // Aggregate matrix by Year x Month
-//   const { years, matrix } = useMemo(() => {
-//     if (!dfFull.length) return { years: [], matrix: {} };
-
-//     const isAvg = metricCol.includes('avg');
-//     const store = {}; // { '2024': { 1: { sum, count }, ... } }
-//     const yearSet = new Set();
-
-//     dfFull.forEach((row) => {
-//       if (!row.date || row[metricCol] == null) return;
-//       const d = new Date(row.date);
-//       const y = d.getFullYear();
-//       const m = d.getMonth() + 1;
-
-//       yearSet.add(y);
-//       if (!store[y]) store[y] = {};
-//       if (!store[y][m]) store[y][m] = { sum: 0, count: 0 };
-
-//       store[y][m].sum += Number(row[metricCol]);
-//       store[y][m].count += 1;
-//     });
-
-//     const sortedYears = Array.from(yearSet).sort((a, b) => b - a);
-//     const calculatedMatrix = {};
-
-//     sortedYears.forEach((y) => {
-//       calculatedMatrix[y] = {};
-//       for (let m = 1; m <= 12; m++) {
-//         const item = store[y]?.[m];
-//         if (!item) {
-//           calculatedMatrix[y][m] = null;
-//         } else {
-//           calculatedMatrix[y][m] = isAvg ? item.sum / item.count : item.sum;
-//         }
-//       }
-//     });
-
-//     return { years: sortedYears, matrix: calculatedMatrix };
-//   }, [dfFull, metricCol]);
-
-//   // Handle Monthly Growth Calculation
-//   const finalMatrix = useMemo(() => {
-//     if (viewMode === 'Total') return matrix;
-
-//     const growthMatrix = {};
-//     const chronologicalYears = [...years].sort((a, b) => a - b);
-//     let prevVal = null;
-
-//     chronologicalYears.forEach((y) => {
-//       growthMatrix[y] = {};
-//       for (let m = 1; m <= 12; m++) {
-//         const currVal = matrix[y][m];
-//         if (currVal === null || prevVal === null || prevVal === 0) {
-//           growthMatrix[y][m] = null;
-//         } else {
-//           growthMatrix[y][m] = (currVal - prevVal) / prevVal;
-//         }
-//         if (currVal !== null) prevVal = currVal;
-//       }
-//     });
-
-//     return growthMatrix;
-//   }, [matrix, years, viewMode]);
-
-//   const startDt = new Date(startDate);
-//   const endDt = new Date(endDate);
-
-//   const isHighlighted = (year, monthIdx) => {
-//     const cellDate = new Date(year, monthIdx, 1);
-//     const startCompare = new Date(startDt.getFullYear(), startDt.getMonth(), 1);
-//     return cellDate >= startCompare && cellDate <= endDt;
-//   };
-
-//   return (
-//     <div style={{ fontFamily: 'sans-serif', margin: '16px 0' }}>
-//       <div style={{ marginBottom: '12px' }}>
-//         <label style={{ marginRight: '12px', fontWeight: 600 }}>Metric View:</label>
-//         <button
-//           onClick={() => setViewMode('Total')}
-//           style={{
-//             marginRight: '8px',
-//             padding: '4px 12px',
-//             backgroundColor: viewMode === 'Total' ? '#2563EB' : '#E2E8F0',
-//             color: viewMode === 'Total' ? '#FFF' : '#0F172A',
-//             border: 'none',
-//             borderRadius: '4px',
-//           }}
-//         >
-//           Total
-//         </button>
-//         <button
-//           onClick={() => setViewMode('Monthly Growth')}
-//           style={{
-//             padding: '4px 12px',
-//             backgroundColor: viewMode === 'Monthly Growth' ? '#2563EB' : '#E2E8F0',
-//             color: viewMode === 'Monthly Growth' ? '#FFF' : '#0F172A',
-//             border: 'none',
-//             borderRadius: '4px',
-//           }}
-//         >
-//           Monthly Growth
-//         </button>
-//       </div>
-
-//       <div style={{ overflowX: 'auto', maxHeight: '350px' }}>
-//         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'right', fontSize: '0.85rem' }}>
-//           <thead>
-//             <tr style={{ borderBottom: '2px solid #CBD5E1', backgroundColor: '#F8FAFC' }}>
-//               <th style={{ padding: '8px', textAlign: 'left' }}>Year</th>
-//               {months.map((m) => (
-//                 <th key={m} style={{ padding: '8px' }}>{m}</th>
-//               ))}
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {years.map((yr) => (
-//               <tr key={yr} style={{ borderBottom: '1px solid #E2E8F0' }}>
-//                 <td style={{ padding: '8px', textAlign: 'left', fontWeight: 600 }}>{yr}</td>
-//                 {months.map((m, idx) => {
-//                   const val = finalMatrix[yr]?.[idx + 1];
-//                   const highlighted = isHighlighted(yr, idx);
-
-//                   let cellText = '-';
-//                   if (val !== null && val !== undefined) {
-//                     cellText =
-//                       viewMode === 'Monthly Growth'
-//                         ? `${(val * 100).toFixed(1)}%`
-//                         : val.toLocaleString('en-US', { maximumFractionDigits: 1 });
-//                   }
-
-//                   return (
-//                     <td
-//                       key={m}
-//                       style={{
-//                         padding: '8px',
-//                         backgroundColor: highlighted ? '#1E3A8A' : 'transparent',
-//                         color: highlighted ? '#FFFFFF' : '#0F172A',
-//                         fontWeight: highlighted ? 600 : 400,
-//                       }}
-//                     >
-//                       {cellText}
-//                     </td>
-//                   );
-//                 })}
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// }
-
-// /**
-//  * 4. Drill-Down Detail Table Component
-//  */
-// export function DrilldownTable({ dfFiltered = [], selectedDate, onClearSelection }) {
-//   if (!selectedDate) {
-//     return (
-//       <div style={{ padding: '12px', backgroundColor: '#EFF6FF', color: '#1E40AF', borderRadius: '4px' }}>
-//         Click any data point on the trend chart above to inspect underlying records for that month.
-//       </div>
-//     );
-//   }
-
-//   const clickedDt = new Date(selectedDate);
-//   const targetYear = clickedDt.getFullYear();
-//   const targetMonth = clickedDt.getMonth();
-
-//   const drillRecords = dfFiltered.filter((row) => {
-//     if (!row.date) return false;
-//     const d = new Date(row.date);
-//     return d.getFullYear() === targetYear && d.getMonth() === targetMonth;
-//   });
-
-//   const displayCols = [
-//     'date', 'recalling_firm', 'class', 'reason_category', 'status',
-//     'voluntary_mandated', 'geo_state', 'geo_city', 'geo_country',
-//     'recalls', 'skus', 'avg_init_to_class_days',
-//     'avg_class_to_term_days', 'avg_init_to_term_days'
-//   ];
-
-//   return (
-//     <div style={{ fontFamily: 'sans-serif', marginTop: '16px' }}>
-//       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-//         <span style={{ fontSize: '0.85rem', color: '#64748B', fontWeight: 600 }}>
-//           DRILL-DOWN RECORDS: {formatDate(clickedDt, 'monthYear')} ({drillRecords.length.toLocaleString()} records)
-//         </span>
-//         <button
-//           onClick={onClearSelection}
-//           style={{
-//             padding: '6px 12px',
-//             backgroundColor: '#EF4444',
-//             color: '#FFF',
-//             border: 'none',
-//             borderRadius: '4px',
-//             cursor: 'pointer',
-//           }}
-//         >
-//           Clear Selection
-//         </button>
-//       </div>
-
-//       {drillRecords.length === 0 ? (
-//         <div style={{ padding: '12px', backgroundColor: '#FEF2F2', color: '#991B1B', borderRadius: '4px' }}>
-//           No line-item detail found for this month under the active dimension filters.
-//         </div>
-//       ) : (
-//         <div style={{ overflowX: 'auto', maxHeight: '300px', border: '1px solid #E2E8F0', borderRadius: '4px' }}>
-//           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
-//             <thead>
-//               <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #CBD5E1' }}>
-//                 {displayCols.map((col) => (
-//                   <th key={col} style={{ padding: '8px', whiteSpace: 'nowrap' }}>{col}</th>
-//                 ))}
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {drillRecords.map((row, idx) => (
-//                 <tr key={idx} style={{ borderBottom: '1px solid #E2E8F0' }}>
-//                   {displayCols.map((col) => (
-//                     <td key={col} style={{ padding: '8px', whiteSpace: 'nowrap' }}>
-//                       {row[col] != null ? String(row[col]) : '-'}
-//                     </td>
-//                   ))}
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-
 import React, { useMemo, useState } from 'react';
 import {
   ResponsiveContainer,
@@ -497,95 +18,205 @@ const formatMetricValue = (val, metricKey) => {
   return Math.round(val).toLocaleString();
 };
 
+const formatDateLabel = (dateStr) => {
+  if (!dateStr) return '';
+  const d = parseLocalDate(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+};
+
+// Helper for Date Parsing
+const parseLocalDate = (dateInput) => {
+  if (!dateInput) return null;
+  if (dateInput instanceof Date) return dateInput;
+  
+  // Handles "2026-01-01" or "2026-01-01T00:00:00" without UTC shift
+  const [datePart] = String(dateInput).split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  
+  if (!year || !month) return new Date(dateInput);
+  return new Date(year, month - 1, day || 1);
+};
+
 // ==============================================================================
 // 1. KPI CARD WITH SPARKLINE
 // ==============================================================================
-export function KpiSparkline({ dfFull, dfFiltered, metricCol, title, startDate, endDate }) {
-  const { currentTotal, percentChange, sparklineData } = useMemo(() => {
-    if (!dfFiltered.length) {
-      return { currentTotal: 0, percentChange: 0, sparklineData: [] };
+export function KpiSparkline({ dfFull = [], dfFiltered = [], metricCol, title, startDate, endDate }) {
+  const { currentTotal, sparklineData } = useMemo(() => {
+    if (!dfFull.length) {
+      return { currentTotal: 0, sparklineData: [] };
     }
 
-    // Sort chronologically
-    const sorted = [...dfFiltered].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const start = parseLocalDate(startDate);
+    const end = parseLocalDate(endDate);
+    const isAvg = metricCol.includes('avg');
 
-    // Aggregate Current Period Total
-    const currentTotal = sorted.reduce((acc, row) => acc + (Number(row[metricCol]) || 0), 0);
+    // Create a Set of valid filtered dates/keys for fast lookup to mirror TrendChart logic
+    const filteredDateSet = new Set(
+      dfFiltered.map((r) => r.date).filter(Boolean)
+    );
 
-    // Calculate Prior Period for % Change Comparison
-    const s = new Date(startDate);
-    const e = new Date(endDate);
-    const durationMs = e.getTime() - s.getTime();
-    const priorStart = new Date(s.getTime() - durationMs);
-    const priorEnd = new Date(s.getTime() - 1);
+    // Group ALL historical data by Year-Month
+    const monthlyMap = {};
+    dfFull.forEach((row) => {
+      const d = parseLocalDate(row.date);
+      if (!d || isNaN(d.getTime())) return;
 
-    const priorSubset = dfFull.filter((row) => {
-      const d = new Date(row.date);
-      return d >= priorStart && d <= priorEnd;
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const val = Number(row[metricCol]);
+      const isValid = row[metricCol] !== null && row[metricCol] !== undefined && !isNaN(val);
+
+      if (!monthlyMap[monthKey]) {
+        monthlyMap[monthKey] = {
+          totalFull: 0,
+          countFull: 0,
+          totalFiltered: 0,
+          countFiltered: 0,
+          dateObj: new Date(d.getFullYear(), d.getMonth(), 1)
+        };
+      }
+
+      if (isValid) {
+        monthlyMap[monthKey].totalFull += val;
+        monthlyMap[monthKey].countFull += 1;
+
+        if (filteredDateSet.has(row.date)) {
+          monthlyMap[monthKey].totalFiltered += val;
+          monthlyMap[monthKey].countFiltered += 1;
+        }
+      }
     });
 
-    const priorTotal = priorSubset.reduce((acc, row) => acc + (Number(row[metricCol]) || 0), 0);
+    const sortedMonths = Object.keys(monthlyMap).sort();
 
-    let percentChange = 0;
-    if (priorTotal > 0) {
-      percentChange = ((currentTotal - priorTotal) / priorTotal) * 100;
-    }
+    const sparklineData = sortedMonths.map((key) => {
+      const item = monthlyMap[key];
+      const valFull = isAvg 
+        ? (item.countFull > 0 ? item.totalFull / item.countFull : 0) 
+        : item.totalFull;
 
-    // Prepare Sparkline Series
-    const sparklineData = sorted.map((d) => ({
-      date: d.date,
-      value: Number(d[metricCol]) || 0,
-    }));
+      const valFiltered = item.countFiltered > 0 
+        ? (isAvg ? item.totalFiltered / item.countFiltered : item.totalFiltered) 
+        : null;
 
-    return { currentTotal, percentChange, sparklineData };
+      return {
+        monthKey: key,
+        displayDate: item.dateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        valFull,
+        valFiltered,
+      };
+    });
+
+    // Current period KPI Value (Sum vs True Average)
+    let validCount = 0;
+    const rawFilteredSum = dfFiltered.reduce((acc, row) => {
+      const val = Number(row[metricCol]);
+      if (row[metricCol] !== null && row[metricCol] !== undefined && !isNaN(val)) {
+        validCount += 1;
+        return acc + val;
+      }
+      return acc;
+    }, 0);
+
+    const currentTotal = isAvg 
+      ? (validCount > 0 ? rawFilteredSum / validCount : 0) 
+      : rawFilteredSum;
+
+    return { currentTotal, sparklineData };
   }, [dfFull, dfFiltered, metricCol, startDate, endDate]);
 
-  const isPositive = percentChange >= 0;
+  const dateRangeText = startDate && endDate 
+    ? `${formatDateLabel(startDate)} - ${formatDateLabel(endDate)}` 
+    : '';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'space-between' }}>
-      <div>
-        <div style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase' }}>
+    <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center' }}>
+      {/* Left 33%: KPI Info */}
+      <div style={{ flex: '0 0 33%', paddingRight: '8px', boxSizing: 'border-box', minWidth: 0 }}>
+        <div style={{ 
+          fontSize: '0.7rem', 
+          color: '#64748B', 
+          fontWeight: 500, 
+          textTransform: 'uppercase', 
+          lineHeight: 1.2,
+          wordBreak: 'break-word',
+          hyphens: 'auto'
+        }}>
           {title}
         </div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '6px' }}>
-          <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0F172A' }}>
+
+        <div style={{ marginTop: '4px' }}>
+          <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0F172A', lineHeight: 1 }}>
             {formatMetricValue(currentTotal, metricCol)}
           </span>
-          {startDate && endDate && (
-            <span
-              style={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: isPositive ? '#16A34A' : '#DC2626',
-              }}
-            >
-              {isPositive ? `+${percentChange.toFixed(1)}%` : `${percentChange.toFixed(1)}%`}
-            </span>
-          )}
         </div>
+
+        {dateRangeText && (
+          <div 
+            style={{ 
+              fontSize: '0.65rem', 
+              color: '#94A3B8', 
+              marginTop: '2px', 
+              lineHeight: 1.1,
+              wordBreak: 'break-word'
+            }}
+          >
+            {dateRangeText}
+          </div>
+        )}
       </div>
 
-      <div style={{ height: '40px', marginTop: '12px' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={sparklineData}>
-            <defs>
-              <linearGradient id={`grad-${metricCol}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#2563EB"
-              strokeWidth={2}
-              fillOpacity={1}
-              fill={`url(#grad-${metricCol})`}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+      {/* Right 67%: Sparkline */}
+      <div style={{ flex: '0 0 67%', height: '100%', minHeight: '48px', minWidth: 0, position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={sparklineData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+              <defs>
+                <linearGradient id={`grad-filtered-${metricCol}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#2563EB" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    const displayVal = data.valFiltered !== null ? data.valFiltered : data.valFull;
+                    return (
+                      <div style={{ backgroundColor: '#1E293B', color: '#FFF', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                        <div>{data.displayDate}</div>
+                        <div style={{ fontWeight: 700 }}>{formatMetricValue(displayVal, metricCol)}</div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+
+              <Area
+                type="monotone"
+                dataKey="valFull"
+                stroke="#94A3B8"
+                strokeWidth={1.5}
+                fill="#F1F5F9"
+                fillOpacity={0.5}
+                isAnimationActive={false}
+              />
+
+              <Area
+                type="monotone"
+                dataKey="valFiltered"
+                stroke="#2563EB"
+                strokeWidth={2}
+                fill={`url(#grad-filtered-${metricCol})`}
+                fillOpacity={1}
+                connectNulls={false}
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
@@ -598,30 +229,60 @@ export function TrendChart({ dfFull, dfFiltered, metricCol, startDate, endDate, 
   const chartData = useMemo(() => {
     if (!dfFull.length) return [];
 
-    // Map full baseline data
-    const fullMap = new Map();
-    dfFull.forEach((row) => {
-      const val = Number(row[metricCol]) || 0;
-      fullMap.set(row.date, (fullMap.get(row.date) || 0) + val);
+    const isAvg = metricCol.includes('avg');
+
+    const processRows = (rows) => {
+      const map = new Map();
+      rows.forEach((row) => {
+        const date = row.date;
+        if (!date) return;
+
+        const rawVal = row[metricCol];
+        const val = Number(rawVal);
+        const isValid = rawVal !== null && rawVal !== undefined && !isNaN(val);
+
+        if (!map.has(date)) {
+          map.set(date, { sum: 0, count: 0 });
+        }
+
+        if (isValid) {
+          const entry = map.get(date);
+          entry.sum += val;
+          entry.count += 1;
+        }
+      });
+      return map;
+    };
+
+    const fullMap = processRows(dfFull);
+    const filteredMap = processRows(dfFiltered);
+
+    const allDates = Array.from(new Set([...fullMap.keys()])).sort((a, b) => {
+      const [y1, m1, d1] = a.split('T')[0].split('-').map(Number);
+      const [y2, m2, d2] = b.split('T')[0].split('-').map(Number);
+      return new Date(y1, m1 - 1, d1) - new Date(y2, m2 - 1, d2);
     });
 
-    // Map time-sliced active data
-    const filteredMap = new Map();
-    dfFiltered.forEach((row) => {
-      const val = Number(row[metricCol]) || 0;
-      filteredMap.set(row.date, (filteredMap.get(row.date) || 0) + val);
+    return allDates.map((date) => {
+      const fullEntry = fullMap.get(date);
+      const filteredEntry = filteredMap.get(date);
+
+      let baseline = 0;
+      if (fullEntry && fullEntry.count > 0) {
+        baseline = isAvg ? fullEntry.sum / fullEntry.count : fullEntry.sum;
+      }
+
+      let active = null;
+      if (filteredEntry && filteredEntry.count > 0) {
+        active = isAvg ? filteredEntry.sum / filteredEntry.count : filteredEntry.sum;
+      }
+
+      return {
+        date,
+        baseline,
+        active,
+      };
     });
-
-    // Combine timeline
-    const allDates = Array.from(new Set([...fullMap.keys()])).sort(
-      (a, b) => new Date(a) - new Date(b)
-    );
-
-    return allDates.map((date) => ({
-      date,
-      baseline: fullMap.get(date) || 0,
-      active: filteredMap.get(date) ?? null, // Null prevents line rendering out of date bounds
-    }));
   }, [dfFull, dfFiltered, metricCol]);
 
   const handleClick = (state) => {
@@ -638,11 +299,30 @@ export function TrendChart({ dfFull, dfFiltered, metricCol, startDate, endDate, 
           <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
           <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} dy={5} />
           <YAxis tick={{ fontSize: 11, fill: '#64748B' }} />
+          
           <Tooltip
-            contentStyle={{ backgroundColor: '#FFFFFF', borderRadius: '6px', border: '1px solid #E2E8F0', fontSize: '0.85rem' }}
-            labelStyle={{ fontWeight: 600, color: '#0F172A' }}
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                const activeVal = data.active !== null ? data.active : data.baseline;
+
+                // Format raw string date into "Mon YYYY"
+                const d = parseLocalDate(data.date);
+                const formattedDate = d && !isNaN(d.getTime()) 
+                  ? d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                  : data.date;
+
+                return (
+                  <div style={{ backgroundColor: '#1E293B', color: '#FFF', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem' }}>
+                    <div>{formattedDate}</div>
+                    <div style={{ fontWeight: 700 }}>{formatMetricValue(activeVal, metricCol)}</div>
+                  </div>
+                );
+              }
+              return null;
+            }}
           />
-          {/* Grayed Baseline */}
+
           <Line
             type="monotone"
             dataKey="baseline"
@@ -651,7 +331,6 @@ export function TrendChart({ dfFull, dfFiltered, metricCol, startDate, endDate, 
             strokeWidth={1.5}
             dot={false}
           />
-          {/* Active Highlighted Period */}
           <Line
             type="monotone"
             dataKey="active"

@@ -323,9 +323,9 @@ useEffect(() => {
       <main style={{ flex: 1, padding: '32px', overflowY: 'auto' }}>
         {/* Header */}
         <div style={{ marginBottom: '24px' }}>
-          <h1 style={{ margin: '0 0 4px 0', fontSize: '1.75rem', color: '#0F172A' }}>Global Food Recalls</h1>
+          <h1 style={{ margin: '0 0 4px 0', fontSize: '1.75rem', color: '#0F172A' }}>GLOBAL FOOD RECALLS</h1>
           <div style={{ fontSize: '0.9rem', color: '#64748B' }}>
-            Monthly Food Enforcement Data | <span style={{ fontWeight: 600 }}>Rolling 10 Years</span>
+            <span style={{ fontWeight: 600 }}>MONTHLY FOOD ENFORCEMENT DATA |</span> ROLLING 10 YEARS
           </div>
         </div>
 
