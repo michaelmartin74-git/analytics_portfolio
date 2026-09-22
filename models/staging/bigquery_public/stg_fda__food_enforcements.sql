@@ -11,8 +11,8 @@ source as (
     select * from {{ source('fda_food','food_enforcement') }}
 
     {% if is_incremental() %}
-      -- Filter to only pull new/updated records during incremental runs
-      where report_date >= (select max(report_date) from {{ this }})
+      -- Cast the target timestamp back to a DATE to match the source DATE column
+      where report_date >= (select date(max(report_date)) from {{ this }})
     {% endif %}
 )
 
