@@ -50,19 +50,18 @@ jobs:
           DBT_BIGQUERY_PROJECT: ${{ secrets.DBT_BIGQUERY_PROJECT }}
           DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: |
-          python export_bigquery_tables.py
+          python scripts/export_bigquery_tables.py
 
       - name: Process Parquet to JSON for React Dashboard
         run: |
-          python agg_recalls_export_to_json.py
+          python scripts/agg_recalls_export_to_json.py
 
       - name: Commit and Push Updated Data Files
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add *.parquet dashboards/react/recalls-dashboard/public/data/agg_recalls_data.json
+          git add scripts/*.parquet dashboards/react/recalls-dashboard/public/data/agg_recalls_data.json
           
-          # Check if there are changes before committing
           if git diff --staged --quiet; then
             echo "No data changes detected to commit."
           else
