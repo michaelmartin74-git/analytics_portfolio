@@ -16,13 +16,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11' # Upgraded from 3.10 to clear those GCP deprecation warnings
 
       - name: Install Dependencies
         run: |
           pip install dbt-bigquery
 
       - name: Authenticate to BigQuery
+        id: auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
@@ -30,10 +31,7 @@ jobs:
       - name: Run dbt
         env:
           IS_SUNDAY: ${{ github.event.schedule == '0 17 * * 0' }}
-          GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY }}
-          # Optionally override project/dataset if not hardcoded in profiles.yml:
-          # DBT_BIGQUERY_PROJECT: "your-gcp-project-id"
-          # DBT_BIGQUERY_DATASET: "your_dataset"
+          # GCP_SA_KEY_PATH is supplied automatically by the auth step above
         run: |
           dbt deps --profiles-dir .
           if [ "$IS_SUNDAY" = "true" ]; then
