@@ -32,8 +32,8 @@ jobs:
         env:
           IS_SUNDAY: ${{ github.event.schedule == '0 17 * * 0' }}
           GCP_SA_KEY_PATH: ${{ steps.auth.outputs.credentials_file_path }}
-          DBT_BIGQUERY_PROJECT: "analytics-portfolio-506805" 
-          DBT_BIGQUERY_DATASET: "dev"             
+          DBT_BIGQUERY_PROJECT: ${{ secrets.DBT_BIGQUERY_PROJECT }}
+          DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: |
           dbt deps --profiles-dir .
           if [ "$IS_SUNDAY" = "true" ]; then

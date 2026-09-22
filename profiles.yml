@@ -4,7 +4,7 @@ analytics_portfolio:
     dev:
       type: bigquery
       method: service-account
-      project: "{{ env_var('DBT_BIGQUERY_PROJECT', 'analytics-portfolio-506805') }}"
-      dataset: "{{ env_var('DBT_BIGQUERY_DATASET', 'dev') }}"
+      project: "{{ env_var('DBT_BIGQUERY_PROJECT') }}"
+      dataset: "{{ env_var('DBT_BIGQUERY_DATASET') }}"
       keyfile: "{{ env_var('GCP_SA_KEY_PATH') }}"
       threads: 4
