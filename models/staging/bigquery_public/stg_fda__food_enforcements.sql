@@ -1,7 +1,19 @@
+{{
+  config(
+    materialized='incremental',
+    unique_key='recall_sk'
+  )
+}}
+
 with
 
 source as (
     select * from {{ source('fda_food','food_enforcement') }}
+
+    {% if is_incremental() %}
+      -- Filter to only pull new/updated records during incremental runs
+      where parse_date('%Y%m%d', report_date) >= (select max(report_date) from {{ this }})
+    {% endif %}
 )
 
 ,renamed as (
