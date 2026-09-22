@@ -12,7 +12,7 @@ source as (
 
     {% if is_incremental() %}
       -- Filter to only pull new/updated records during incremental runs
-      where parse_date('%Y%m%d', report_date) >= (select max(report_date) from {{ this }})
+      where report_date >= (select max(report_date) from {{ this }})
     {% endif %}
 )
 
