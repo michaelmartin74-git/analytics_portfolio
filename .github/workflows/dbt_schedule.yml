@@ -2,9 +2,8 @@ name: dbt Daily & Weekly Refresh
 
 on:
   schedule:
-    # Daily at 10:00 AM MST (17:00 UTC)
     - cron: '0 17 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   dbt_run:
@@ -30,14 +29,17 @@ jobs:
 
       - name: Run dbt
         env:
-          # Check if today is Sunday (0 in POSIX date syntax)
           IS_SUNDAY: ${{ github.event.schedule == '0 17 * * 0' }}
+          GCP_SA_KEY_JSON: ${{ secrets.GCP_SA_KEY }}
+          # Optionally override project/dataset if not hardcoded in profiles.yml:
+          # DBT_BIGQUERY_PROJECT: "your-gcp-project-id"
+          # DBT_BIGQUERY_DATASET: "your_dataset"
         run: |
-          dbt deps
+          dbt deps --profiles-dir .
           if [ "$IS_SUNDAY" = "true" ]; then
             echo "Running Sunday Full Refresh..."
-            dbt run --full-refresh
+            dbt run --full-refresh --profiles-dir .
           else
             echo "Running Daily Incremental Run..."
-            dbt run
+            dbt run --profiles-dir .
           fi
