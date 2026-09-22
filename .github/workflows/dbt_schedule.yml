@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # Upgraded from 3.10 to clear those GCP deprecation warnings
+          python-version: '3.11'
 
       - name: Install Dependencies
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Run dbt
         env:
           IS_SUNDAY: ${{ github.event.schedule == '0 17 * * 0' }}
-          # GCP_SA_KEY_PATH is supplied automatically by the auth step above
+          GCP_SA_KEY_PATH: ${{ steps.auth.outputs.credentials_file_path }}
         run: |
           dbt deps --profiles-dir .
           if [ "$IS_SUNDAY" = "true" ]; then
