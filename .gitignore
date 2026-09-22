@@ -31,3 +31,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# Allow dashboard JSON export
+!dashboards/react/recalls-dashboard/public/data/agg_recalls_data.json
