@@ -1,0 +1,43 @@
+name: dbt Daily & Weekly Refresh
+
+on:
+  schedule:
+    # Daily at 10:00 AM MST (17:00 UTC)
+    - cron: '0 17 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  dbt_run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install dbt-bigquery
+
+      - name: Authenticate to BigQuery
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Run dbt
+        env:
+          # Check if today is Sunday (0 in POSIX date syntax)
+          IS_SUNDAY: ${{ github.event.schedule == '0 17 * * 0' }}
+        run: |
+          dbt deps
+          if [ "$IS_SUNDAY" = "true" ]; then
+            echo "Running Sunday Full Refresh..."
+            dbt run --full-refresh
+          else
+            echo "Running Daily Incremental Run..."
+            dbt run
+          fi
