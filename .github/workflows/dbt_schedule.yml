@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install dbt-bigquery
+          pip install dbt-bigquery pandas pyarrow db-dtypes duckdb google-cloud-bigquery
 
       - name: Authenticate to BigQuery
         id: auth
@@ -30,16 +30,41 @@ jobs:
 
       - name: Run dbt
         env:
-          IS_SUNDAY: ${{ github.event.schedule == '0 17 * * 0' }}
           GCP_SA_KEY_PATH: ${{ steps.auth.outputs.credentials_file_path }}
           DBT_BIGQUERY_PROJECT: ${{ secrets.DBT_BIGQUERY_PROJECT }}
           DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: |
           dbt deps --profiles-dir .
-          if [ "$IS_SUNDAY" = "true" ]; then
+          DAY_OF_WEEK=$(date +%u)
+          if [ "$DAY_OF_WEEK" -eq 7 ]; then
             echo "Running Sunday Full Refresh..."
             dbt run --full-refresh --profiles-dir .
           else
             echo "Running Daily Incremental Run..."
             dbt run --profiles-dir .
+          fi
+
+      - name: Export BigQuery Tables to Parquet
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+          DBT_BIGQUERY_PROJECT: ${{ secrets.DBT_BIGQUERY_PROJECT }}
+          DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
+        run: |
+          python scripts/export_bigquery_tables.py
+
+      - name: Process Parquet to JSON for React Dashboard
+        run: |
+          python scripts/agg_recalls_export_to_json.py
+
+      - name: Commit and Push Updated Data Files
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add scripts/*.parquet dashboards/react/recalls-dashboard/public/data/agg_recalls_data.json
+          
+          if git diff --staged --quiet; then
+            echo "No data changes detected to commit."
+          else
+            git commit -m "auto: update exported parquet and dashboard JSON files [skip ci]"
+            git push
           fi
