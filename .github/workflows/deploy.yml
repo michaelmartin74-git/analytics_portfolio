@@ -25,34 +25,37 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Setup Python & Enable Pip Cache
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+          cache: 'pip' # Caches downloaded wheels across workflow runs
 
       - name: Install dbt & Generate Docs
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          # Supply the GCP project ID expected by profiles.yml
+          DBT_BIGQUERY_PROJECT: ${{ secrets.DBT_BIGQUERY_PROJECT }}
+          # Optional: add dataset or target if profiles.yml uses them
+          # DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
         run: |
           python -m pip install --upgrade pip
           pip install dbt-bigquery
           
-          # Write service account key to a temporary runner path
+          # Write service account key to temporary location
           echo "$GCP_SA_KEY" > /tmp/gcp_key.json
           export GCP_SA_KEY_PATH="/tmp/gcp_key.json"
           
-          # Generate dbt artifacts (index.html, manifest.json, catalog.json)
+          # Generate dbt docs artifacts
           dbt docs generate
           
-          # Ensure public/dbt folder exists in React project
+          # Copy generated artifacts into React public asset directory
           mkdir -p dashboards/react/recalls-dashboard/public/dbt
-          
-          # Copy artifacts into React's public assets
           cp target/index.html dashboards/react/recalls-dashboard/public/dbt/
           cp target/manifest.json dashboards/react/recalls-dashboard/public/dbt/
           cp target/catalog.json dashboards/react/recalls-dashboard/public/dbt/
           
-          # Remove temporary key file
+          # Clean up temporary key
           rm /tmp/gcp_key.json
 
       - name: Setup Node.js
@@ -69,7 +72,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Points directly to your built distribution folder
           path: 'dashboards/react/recalls-dashboard/dist'
 
       - name: Deploy to GitHub Pages
