@@ -37,7 +37,7 @@ jobs:
           # Supply the GCP project ID expected by profiles.yml
           DBT_BIGQUERY_PROJECT: ${{ secrets.DBT_BIGQUERY_PROJECT }}
           # Optional: add dataset or target if profiles.yml uses them
-          # DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET }}
+          DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET || 'dev' }}
         run: |
           python -m pip install --upgrade pip
           pip install dbt-bigquery
