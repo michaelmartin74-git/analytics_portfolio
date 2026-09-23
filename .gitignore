@@ -32,5 +32,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Allow all files inside the React public folder
+# Allow React app configuration and public files
+!dashboards/react/recalls-dashboard/package.json
+!dashboards/react/recalls-dashboard/package-lock.json
 !dashboards/react/recalls-dashboard/public/**
