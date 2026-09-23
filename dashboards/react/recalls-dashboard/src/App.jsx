@@ -331,9 +331,6 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* dbt Documentation Link */}
-        <DbtDocsButton />
-
         {/* Row 1: KPI Cards + Sparklines */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
           {METRICS_CONFIG.map(({ key, label }) => (
@@ -414,6 +411,10 @@ useEffect(() => {
           Last refresh date of data: {maxDataDate}
         </div>
       </main>
+      
+        {/* dbt Documentation Link */}
+        <DbtDocsButton />
+        
     </div>
   );
 }
