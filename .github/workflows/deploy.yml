@@ -41,6 +41,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install dbt-bigquery
+          dbt deps
           
           # Write service account key to temporary location
           echo "$GCP_SA_KEY" > /tmp/gcp_key.json
