@@ -1,4 +1,4 @@
-export function DbtDocsButton() {
+export default function DbtDocsButton() {
   return (
     <a
       href={`${import.meta.env.BASE_URL}dbt/index.html`}
