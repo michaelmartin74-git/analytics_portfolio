@@ -5,6 +5,7 @@ import {
   SegmentedTable,
   DrilldownTable,
 } from './DashboardComponents';
+import DbtDocsButton from './DbtDocsButton';
 
 // ==============================================================================
 // 1. CONFIGURATION & CONSTANTS
@@ -329,6 +330,9 @@ useEffect(() => {
             <span style={{ fontWeight: 600 }}>MONTHLY FOOD ENFORCEMENT DATA |</span> ROLLING 10 YEARS
           </div>
         </div>
+
+        {/* dbt Documentation Link */}
+        <DbtDocsButton />
 
         {/* Row 1: KPI Cards + Sparklines */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
