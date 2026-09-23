@@ -32,6 +32,5 @@ dist-ssr
 *.sln
 *.sw?
 
-
-# Allow dashboard JSON export
-!dashboards/react/recalls-dashboard/public/data/agg_recalls_data.json
+# Allow all files inside the React public folder
+!dashboards/react/recalls-dashboard/public/**

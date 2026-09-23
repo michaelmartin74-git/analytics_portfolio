@@ -58,7 +58,8 @@ export default function DashboardPage() {
   // ==============================================================================
 useEffect(() => {
   // Relative URL path — works locally AND on a live public website
-  fetch('/data/agg_recalls_data.json')
+  //fetch('/data/agg_recalls_data.json')
+  fetch(`${import.meta.env.BASE_URL}data/agg_recalls_data.json`)
     .then((res) => {
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
