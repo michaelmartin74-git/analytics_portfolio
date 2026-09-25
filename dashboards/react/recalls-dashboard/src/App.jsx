@@ -411,9 +411,6 @@ useEffect(() => {
           Last refresh date of data: {maxDataDate}
         </div>
       </main>
-      
-        {/* dbt Documentation Link */}
-        <DbtDocsButton />
         
     </div>
   );
