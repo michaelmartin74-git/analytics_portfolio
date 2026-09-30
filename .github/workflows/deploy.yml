@@ -31,6 +31,21 @@ jobs:
           python-version: '3.10'
           cache: 'pip' # Caches downloaded wheels across workflow runs
 
+      - name: Cache dbt packages
+        uses: actions/cache@v4
+        with:
+          path: dbt_packages
+          key: ${{ runner.os }}-dbt-${{ hashFiles('**/packages.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-dbt-
+
+      - name: Setup Node.js & Enable NPM Cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: dashboards/react/recalls-dashboard/package-lock.json
+
       - name: Install dbt & Generate Docs
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
@@ -39,30 +54,27 @@ jobs:
           # Optional: add dataset or target if profiles.yml uses them
           DBT_BIGQUERY_DATASET: ${{ secrets.DBT_BIGQUERY_DATASET || 'dev' }}
         run: |
-          python -m pip install --upgrade pip
-          pip install dbt-bigquery
-          dbt deps
+          pip install --no-cache-dir dbt-bigquery
           
-          # Write service account key to temporary location
+          # Only pull packages if dbt_packages wasn't restored or updated
+          if [ ! -d "dbt_packages" ]; then
+            dbt deps
+          fi
+
+          # Handle Service Account key
           echo "$GCP_SA_KEY" > /tmp/gcp_key.json
           export GCP_SA_KEY_PATH="/tmp/gcp_key.json"
-          
-          # Generate dbt docs artifacts
+
+          # Generate dbt docs
           dbt docs generate
-          
-          # Copy generated artifacts into React public asset directory
+
+          # Copy generated artifacts into React public directory
           mkdir -p dashboards/react/recalls-dashboard/public/dbt
           cp target/index.html dashboards/react/recalls-dashboard/public/dbt/
           cp target/manifest.json dashboards/react/recalls-dashboard/public/dbt/
           cp target/catalog.json dashboards/react/recalls-dashboard/public/dbt/
-          
-          # Clean up temporary key
-          rm /tmp/gcp_key.json
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+          rm /tmp/gcp_key.json
 
       - name: Install dependencies & Build React App
         run: |
