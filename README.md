@@ -5,7 +5,7 @@ An end-to-end analytics engineering repository demonstrating production-style db
 | Project / Artifact | Tech Stack | Status | Link |
 | :--- | :--- | :--- | :--- |
 | **Streamlit Dashboard** | Python, Streamlit, BigQuery | `Completed` | [Launch App 🚀](https://analyticsportfolio-tzkv83oktxw3hzmcyqkpck.streamlit.app/) |
-| **React Analytics UI** | React, JavaScript, APIs | `In Development` | [Launch App 🚀](https://michaelmartin74-git.github.io/analytics_portfolio/) |
+| **React Analytics UI** | React, JavaScript, APIs | `Completed` | [Launch App 🚀](https://michaelmartin74-git.github.io/analytics_portfolio/) |
 | **dbt Documentation** | dbt Core, Static Docs | `Live` | [View Docs 📖](https://michaelmartin74-git.github.io/analytics_portfolio/dbt/index.html) |
 
 ---
