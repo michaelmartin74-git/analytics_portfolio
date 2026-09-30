@@ -413,7 +413,6 @@ useEffect(() => {
 
           <SegmentedTable
             dfFull={dimFilteredDf}
-            dfFiltered={fullyFilteredDf}
             metricCol={activeMetricCol}
             startDate={startDate}
             endDate={endDate}

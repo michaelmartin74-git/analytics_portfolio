@@ -460,18 +460,31 @@ export function DrilldownTable({ dfFiltered, selectedDate, onClearSelection }) {
 // ==============================================================================
 // 4. YEAR OVER MONTH MATRIX (SEGMENTED TABLE)
 // ==============================================================================
-export function SegmentedTable({ dfFiltered, metricCol }) {
+export function SegmentedTable({ dfFull = [], metricCol, startDate, endDate }) {
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const [viewMode, setViewMode] = useState('totals'); // 'totals' | 'mom'
+
+  // Date range boundaries for highlighting
+  const rangeBounds = useMemo(() => {
+    if (!startDate || !endDate) return null;
+    const start = parseLocalDate(startDate);
+    const end = parseLocalDate(endDate);
+    if (!start || !end) return null;
+    return {
+      startMs: new Date(start.getFullYear(), start.getMonth(), 1).getTime(),
+      endMs: new Date(end.getFullYear(), end.getMonth() + 1, 0).getTime(),
+    };
+  }, [startDate, endDate]);
 
   const { matrix, years, maxVal } = useMemo(() => {
     const grid = {};
     const yearSet = new Set();
     let max = 0;
 
-    dfFiltered.forEach((row) => {
+    dfFull.forEach((row) => {
       if (!row.date) return;
-      const d = new Date(row.date);
-      if (isNaN(d)) return;
+      const d = parseLocalDate(row.date);
+      if (!d || isNaN(d.getTime())) return;
 
       const year = d.getFullYear();
       const monthIdx = d.getMonth();
@@ -487,52 +500,147 @@ export function SegmentedTable({ dfFiltered, metricCol }) {
 
     const sortedYears = Array.from(yearSet).sort((a, b) => b - a);
     return { matrix: grid, years: sortedYears, maxVal: max };
-  }, [dfFiltered, metricCol]);
+  }, [dfFull, metricCol]);
+
+  // Helper to determine prior month value (Jan -> Dec of prior year)
+  const getPriorMonthVal = (year, monthIdx) => {
+    if (monthIdx === 0) {
+      return matrix[year - 1]?.[11] ?? null;
+    }
+    return matrix[year]?.[monthIdx - 1] ?? null;
+  };
 
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'center' }}>
-        <thead>
-          <tr style={{ borderBottom: '2px solid #E2E8F0', color: '#475569' }}>
-            <th style={{ padding: '8px', textAlign: 'left' }}>Year</th>
-            {MONTHS.map((m) => (
-              <th key={m} style={{ padding: '8px' }}>{m}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {years.length > 0 ? (
-            years.map((yr) => (
-              <tr key={yr} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                <td style={{ padding: '8px', fontWeight: 700, textAlign: 'left', color: '#0F172A' }}>{yr}</td>
-                {matrix[yr].map((val, idx) => {
-                  const intensity = maxVal > 0 ? val / maxVal : 0;
-                  const bgAlpha = (intensity * 0.35).toFixed(2);
-                  return (
-                    <td
-                      key={idx}
-                      style={{
-                        padding: '8px',
-                        backgroundColor: val > 0 ? `rgba(37, 99, 235, ${bgAlpha})` : 'transparent',
-                        color: val > 0 ? '#0F172A' : '#94A3B8',
-                        fontWeight: val > 0 ? 600 : 400,
-                      }}
-                    >
-                      {val > 0 ? formatMetricValue(val, metricCol) : '-'}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={13} style={{ padding: '20px', color: '#94A3B8' }}>
-                No matrix data available.
-              </td>
+    <div>
+      {/* View Mode Toggle Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', letterSpacing: '0.05em' }}>
+          SEASONALITY MATRIX ({viewMode === 'totals' ? 'TOTALS' : 'M/M GROWTH'})
+        </span>
+        <div style={{ display: 'flex', gap: '4px', backgroundColor: '#F1F5F9', padding: '2px', borderRadius: '6px' }}>
+          <button
+            onClick={() => setViewMode('totals')}
+            style={{
+              padding: '4px 10px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              backgroundColor: viewMode === 'totals' ? '#FFFFFF' : 'transparent',
+              color: viewMode === 'totals' ? '#0F172A' : '#64748B',
+              boxShadow: viewMode === 'totals' ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+            }}
+          >
+            Totals
+          </button>
+          <button
+            onClick={() => setViewMode('mom')}
+            style={{
+              padding: '4px 10px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              backgroundColor: viewMode === 'mom' ? '#FFFFFF' : 'transparent',
+              color: viewMode === 'mom' ? '#0F172A' : '#64748B',
+              boxShadow: viewMode === 'mom' ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+            }}
+          >
+            M/M Growth
+          </button>
+        </div>
+      </div>
+
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'center' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid #E2E8F0', color: '#475569' }}>
+              <th style={{ padding: '8px', textAlign: 'left' }}>Year</th>
+              {MONTHS.map((m) => (
+                <th key={m} style={{ padding: '8px' }}>{m}</th>
+              ))}
+              {/* NEW: Total Header */}
+              <th style={{ padding: '8px', borderLeft: '1px solid #E2E8F0', fontWeight: 700 }}>Total</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {years.length > 0 ? (
+              years.map((yr) => {
+                // NEW: Calculate annual sum for the row
+                const annualTotal = matrix[yr].reduce((sum, v) => sum + v, 0);
+                return (
+                <tr key={yr} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                  <td style={{ padding: '8px', fontWeight: 700, textAlign: 'left', color: '#0F172A' }}>{yr}</td>
+                  {matrix[yr].map((val, idx) => {
+                    const cellMs = new Date(yr, idx, 1).getTime();
+                    const isInRange = rangeBounds
+                      ? cellMs >= rangeBounds.startMs && cellMs <= rangeBounds.endMs
+                      : true;
+
+                    // Calculate M/M Growth rate
+                    const priorVal = getPriorMonthVal(yr, idx);
+                    let momGrowth = null;
+                    if (priorVal !== null && priorVal > 0) {
+                      momGrowth = ((val - priorVal) / priorVal) * 100;
+                    }
+
+                    // Background highlight logic (blue highlight only when in date range)
+                    const intensity = maxVal > 0 ? val / maxVal : 0;
+                    const bgAlpha = (intensity * 0.35).toFixed(2);
+                    const bgColor = isInRange && val > 0 
+                      ? `rgba(37, 99, 235, ${bgAlpha})` 
+                      : 'transparent';
+
+                    return (
+                      <td
+                        key={idx}
+                        style={{
+                          padding: '8px',
+                          backgroundColor: bgColor,
+                          color: isInRange ? '#0F172A' : '#94A3B8',
+                          fontWeight: isInRange && val > 0 ? 600 : 400,
+                        }}
+                      >
+                        {viewMode === 'totals' ? (
+                          val > 0 ? formatMetricValue(val, metricCol) : '-'
+                        ) : (
+                          momGrowth !== null ? (
+                            <span style={{ color: momGrowth >= 0 ? '#16A34A' : '#DC2626' }}>
+                              {momGrowth > 0 ? `+${momGrowth.toFixed(1)}%` : `${momGrowth.toFixed(1)}%`}
+                            </span>
+                          ) : '-'
+                        )}
+                      </td>
+                    );
+                  })}
+
+                  {/* Render Annual Row Total */}
+                  <td
+                    style={{
+                      padding: '8px',
+                      fontWeight: 700,
+                      color: '#0F172A',
+                      borderLeft: '1px solid #E2E8F0',
+                      backgroundColor: '#F8FAFC',
+                    }}
+                  >
+                    {annualTotal > 0 ? formatMetricValue(annualTotal, metricCol) : '-'}
+                  </td>
+                </tr>
+              );
+            })
+            ) : (
+              <tr>
+                <td colSpan={13} style={{ padding: '20px', color: '#94A3B8' }}>
+                  No matrix data available.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
