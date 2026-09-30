@@ -380,11 +380,25 @@ useEffect(() => {
 
         {/* Row 3: Drill-Down Detail Table */}
         <div style={{ backgroundColor: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid #E2E8F0', marginBottom: '24px' }}>
-          <DrilldownTable
-            dfFiltered={dimFilteredDf}
-            selectedDate={selectedChartDate}
-            onClearSelection={() => setSelectedChartDate(null)}
-          />
+          {selectedChartDate ? (
+            <DrilldownTable
+              dfFiltered={dimFilteredDf}
+              selectedDate={selectedChartDate}
+              onClearSelection={() => setSelectedChartDate(null)}
+            />
+          ) : (
+            <div style={{ 
+              padding: '24px', 
+              textAlign: 'center', 
+              backgroundColor: '#F8FAFC', 
+              borderRadius: '6px', 
+              border: '1px dashed #CBD5E1',
+              color: '#64748B',
+              fontSize: '0.875rem' 
+            }}>
+              💡 Click any data point on the trend chart above to inspect underlying records for that month.
+            </div>
+          )}
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '24px 0' }} />
@@ -399,7 +413,6 @@ useEffect(() => {
 
           <SegmentedTable
             dfFull={dimFilteredDf}
-            dfFiltered={fullyFilteredDf}
             metricCol={activeMetricCol}
             startDate={startDate}
             endDate={endDate}
