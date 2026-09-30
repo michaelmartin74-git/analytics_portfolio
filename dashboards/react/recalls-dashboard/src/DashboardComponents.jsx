@@ -286,9 +286,10 @@ export function TrendChart({ dfFull, dfFiltered, metricCol, startDate, endDate, 
   }, [dfFull, dfFiltered, metricCol]);
 
   const handleClick = (state) => {
-    if (state && state.activePayload && state.activePayload.length) {
-      const clickedDate = state.activePayload[0].payload.date;
-      if (onPointSelect) onPointSelect(clickedDate);
+    // Check activeLabel first (most reliable on LineChart click), fallback to activePayload
+    const clickedDate = state?.activeLabel || state?.activePayload?.[0]?.payload?.date;
+    if (clickedDate && onPointSelect) {
+      onPointSelect(clickedDate);
     }
   };
 
@@ -340,6 +341,11 @@ export function TrendChart({ dfFull, dfFiltered, metricCol, startDate, endDate, 
             dot={{ r: 3, fill: '#2563EB' }}
             activeDot={{ r: 6, cursor: 'pointer' }}
             connectNulls={false}
+            onClick={(entry) => {
+              if (entry?.payload?.date && onPointSelect) {
+                onPointSelect(entry.payload.date);
+              }
+            }}
           />
         </LineChart>
       </ResponsiveContainer>
