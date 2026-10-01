@@ -10,7 +10,19 @@ export function KpiSparkline({ dfFull = [], dfFiltered = [], metricCol, title, s
     : '';
 
   return (
-    <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center' }}>
+      <div 
+        style={{ 
+          backgroundColor: '#FFFFFF', 
+          padding: '16px', 
+          borderRadius: '8px', 
+          border: '1px solid #E2E8F0',
+          display: 'flex', 
+          width: '100%', 
+          height: '100%', 
+          alignItems: 'center',
+          boxSizing: 'border-box'
+        }}
+      >
       {/* Left 33%: KPI Info */}
       <div style={{ flex: '0 0 33%', paddingRight: '8px', boxSizing: 'border-box', minWidth: 0 }}>
         <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 500, textTransform: 'uppercase', lineHeight: 1.2, wordBreak: 'break-word', hyphens: 'auto' }}>

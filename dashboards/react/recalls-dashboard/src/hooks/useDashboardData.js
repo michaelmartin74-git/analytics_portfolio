@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { INITIAL_DIMENSION_STATE } from '../constants/dashboardConfig';
+import { INITIAL_DIMENSION_STATE, DIMENSION_FILTERS } from '../constants/dashboardConfig';
 import { resolveBounds } from '../utils/dateUtils';
 
 export function useDashboardData() {
@@ -42,7 +42,8 @@ export function useDashboardData() {
     setDimensionFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const resetFilters = () => {
+  // Reset all filters back to default
+  const handleResetFilters = () => {
     setPreset('Current Year');
     setCustomStartDate('');
     setCustomEndDate('');
@@ -118,11 +119,61 @@ export function useDashboardData() {
     });
   }, [rawData, dimensionFilters, startDate, endDate]);
 
+  // ==============================================================================
+  // DYNAMIC CROSS-FILTERING PIPELINE
+  // ==============================================================================
+
+  // Baseline temporal slice used for populating dropdown options
+  const baseDateSlice = useMemo(() => {
+    if (!startDate || !endDate) return rawData;
+    return rawData.filter((row) => row.date >= startDate && row.date <= endDate);
+  }, [rawData, startDate, endDate]);
+
+  // Dynamic dropdown options calculated using "All-But-Self" subset
+  const availableOptions = useMemo(() => {
+    const optionsMap = {};
+
+    DIMENSION_FILTERS.forEach(({ key }) => {
+      let subset = baseDateSlice;
+
+      Object.keys(dimensionFilters).forEach((otherKey) => {
+        if (otherKey !== key && dimensionFilters[otherKey] !== 'All') {
+          subset = subset.filter((row) => row[otherKey] === dimensionFilters[otherKey]);
+        }
+      });
+
+      const uniqueVals = Array.from(
+        new Set(subset.map((row) => row[key]).filter(Boolean))
+      ).sort();
+
+      optionsMap[key] = ['All', ...uniqueVals];
+    });
+
+    return optionsMap;
+  }, [baseDateSlice, dimensionFilters]);
+
+  // Layer 1: Apply attribute filters across full timeframe (preserves baseline gray lines)
+  const dimFilteredDf = useMemo(() => {
+    return rawData.filter((row) => {
+      return Object.entries(dimensionFilters).every(([col, val]) => {
+        return val === 'All' || row[col] === val;
+      });
+    });
+  }, [rawData, dimensionFilters]);
+
+  // Layer 2: Slice filtered attributes down to selected temporal range
+  const fullyFilteredDf = useMemo(() => {
+    if (!startDate || !endDate) return dimFilteredDf;
+    return dimFilteredDf.filter((row) => row.date >= startDate && row.date <= endDate);
+  }, [dimFilteredDf, startDate, endDate]);
+
   return {
     loading,
     rawData,
     setRawData,
     filteredData,
+    dimFilteredDf,
+    fullyFilteredDf,
     minDataDate,
     maxDataDate,
     startDate,
@@ -136,12 +187,13 @@ export function useDashboardData() {
     dimensionFilters,
     setDimensionFilters,
     handleDimensionChange,
-    resetFilters,
+    handleResetFilters,
     activeMetricCol,
     setActiveMetricCol,
     selectedChartDate,
     setSelectedChartDate,
     isSidebarOpen,
     setIsSidebarOpen,
+    availableOptions
   };
 }

@@ -6,6 +6,7 @@ import { TrendChart } from './components/TrendChart';
 import { DrilldownTable } from './components/DrilldownTable';
 import { SegmentedTable } from './components/SegmentedTable';
 import { toISODate } from './utils/formatters';
+import { Sidebar } from './components/Sidebar';
 
 
 export default function DashboardPage() {
@@ -13,6 +14,8 @@ export default function DashboardPage() {
     loading,
     rawData,
     filteredData,
+    dimFilteredDf,
+    fullyFilteredDf,
     minDataDate,
     maxDataDate,
     startDate,
@@ -26,88 +29,15 @@ export default function DashboardPage() {
     dimensionFilters,
     setDimensionFilters,
     handleDimensionChange,
-    resetFilters,
+    handleResetFilters,
     activeMetricCol,
     setActiveMetricCol,
     selectedChartDate,
     setSelectedChartDate,
     isSidebarOpen,
     setIsSidebarOpen,
+    availableOptions,
   } = useDashboardData();
-
-  // ==============================================================================
-  // 4. DYNAMIC CROSS-FILTERING PIPELINE
-  // ==============================================================================
-  
-  // Baseline temporal slice used for populating dropdown options
-  const baseDateSlice = useMemo(() => {
-    if (!startDate || !endDate) return rawData;
-    const s = new Date(startDate);
-    const e = new Date(endDate);
-    return rawData.filter((row) => {
-      const d = new Date(row.date);
-      return d >= s && d <= e;
-    });
-  }, [rawData, startDate, endDate]);
-
-  // Dynamic dropdown options calculated using "All-But-Self" subset
-  const availableOptions = useMemo(() => {
-    const optionsMap = {};
-
-    DIMENSION_FILTERS.forEach(({ key }) => {
-      let subset = baseDateSlice;
-
-      // Filter against all ACTIVE selections EXCEPT the current column
-      Object.keys(dimensionFilters).forEach((otherKey) => {
-        if (otherKey !== key && dimensionFilters[otherKey] !== 'All') {
-          subset = subset.filter((row) => row[otherKey] === dimensionFilters[otherKey]);
-        }
-      });
-
-      const uniqueVals = Array.from(
-        new Set(subset.map((row) => row[key]).filter(Boolean))
-      ).sort();
-
-      optionsMap[key] = ['All', ...uniqueVals];
-    });
-
-    return optionsMap;
-  }, [baseDateSlice, dimensionFilters]);
-
-  // Layer 1: Apply attribute filters across full timeframe (preserves baseline gray lines)
-  const dimFilteredDf = useMemo(() => {
-    return rawData.filter((row) => {
-      return Object.entries(dimensionFilters).every(([col, val]) => {
-        return val === 'All' || row[col] === val;
-      });
-    });
-  }, [rawData, dimensionFilters]);
-
-  // Layer 2: Slice filtered attributes down to selected temporal range
-  const fullyFilteredDf = useMemo(() => {
-    if (!startDate || !endDate) return dimFilteredDf;
-    const s = new Date(startDate);
-    const e = new Date(endDate);
-    return dimFilteredDf.filter((row) => {
-      const d = new Date(row.date);
-      return d >= s && d <= e;
-    });
-  }, [dimFilteredDf, startDate, endDate]);
-
-  const handleResetFilters = () => {
-    setPreset('Current Year');
-    setCustomStartDate(minDataDate);
-    setCustomEndDate(maxDataDate);
-    setDimensionFilters({
-      class: 'All',
-      status: 'All',
-      reason_category: 'All',
-      recalling_firm: 'All',
-      geo_state: 'All',
-      geo_city: 'All',
-    });
-    setSelectedChartDate(null);
-  };
 
   if (loading) {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Loading dashboard data...</div>;
@@ -116,114 +46,22 @@ export default function DashboardPage() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'sans-serif', backgroundColor: '#F8FAFC' }}>
       
-      {/* =================================================================== */}
-      {/* SIDEBAR & INTERACTIVE FILTERS                                      */}
-      {/* =================================================================== */}
-      
-      {/* Toggle Button (Always Visible) */}
-      <button
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        style={{
-          position: 'absolute',
-          top: '25px',
-          left: '5px',
-          zIndex: 10,
-          padding: '3px 3px',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #CBD5E1',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontSize: '0.85rem',
-        }}
-      >
-        {isSidebarOpen ? '✕' : "⚙️"}
-      </button>
-      
-      {/* Conditional Sidebar */}
-      {isSidebarOpen && (
-        <aside style={{ width: '200px', backgroundColor: '#ffffff', padding: '20px 20px 20px 30px', borderRight: '1px solid #E2E8F0' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0F172A' }}>Filters</h3>
-            <button
-              onClick={handleResetFilters}
-              style={{
-                padding: '4px 10px',
-                fontSize: '0.8rem',
-                backgroundColor: '#F1F5F9',
-                border: '1px solid #CBD5E1',
-                borderRadius: '4px',
-                cursor: 'pointer',
-              }}
-            >
-              Clear Filters
-            </button>
-          </div>
-
-          {/* Date Preset Selector */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
-              Date Range Preset
-            </label>
-            <select
-              value={preset}
-              onChange={(e) => setPreset(e.target.value)}
-              style={{ width: '100%', padding: '8px', border: '1px solid #CBD5E1', borderRadius: '4px' }}
-            >
-              {['Last Month', 'Last 6 Months', 'Current Year', 'Last Year', 'Custom', 'All Time'].map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-
-            {/* Custom Date Inputs */}
-            {preset === 'Custom' && (
-              <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <input
-                  type="date"
-                  value={customStartDate || minDataDate}
-                  min={minDataDate}
-                  max={maxDataDate}
-                  onChange={(e) => setCustomStartDate(e.target.value)}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #CBD5E1', borderRadius: '4px' }}
-                />
-                <input
-                  type="date"
-                  value={customEndDate || maxDataDate}
-                  min={minDataDate}
-                  max={maxDataDate}
-                  onChange={(e) => setCustomEndDate(e.target.value)}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #CBD5E1', borderRadius: '4px' }}
-                />
-              </div>
-            )}
-          </div>
-
-          <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '20px 0' }} />
-
-          {/* Dimension Selectboxes */}
-          <h4 style={{ margin: '0 0 12px 0', fontSize: '0.95rem', color: '#0F172A' }}>Dimension Filters</h4>
-          {DIMENSION_FILTERS.map(({ key, label }) => {
-            const options = availableOptions[key] || ['All'];
-            const currentValue = options.includes(dimensionFilters[key]) ? dimensionFilters[key] : 'All';
-
-            return (
-              <div key={key} style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '0.8rem', color: '#475569', marginBottom: '4px' }}>
-                  {label}
-                </label>
-                <select
-                  value={currentValue}
-                  onChange={(e) => handleDimensionChange(key, e.target.value)}
-                  style={{ width: '100%', padding: '6px', border: '1px solid #CBD5E1', borderRadius: '4px', fontSize: '0.85rem' }}
-                >
-                  {options.map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-              </div>
-            );
-          })}
-        </aside>
-      )}
+      <Sidebar
+      isOpen={isSidebarOpen}
+      onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+      preset={preset}
+      setPreset={setPreset}
+      customStartDate={customStartDate}
+      setCustomStartDate={setCustomStartDate}
+      customEndDate={customEndDate}
+      setCustomEndDate={setCustomEndDate}
+      minDataDate={minDataDate}
+      maxDataDate={maxDataDate}
+      dimensionFilters={dimensionFilters}
+      handleDimensionChange={handleDimensionChange}
+      availableOptions={availableOptions}
+      onResetFilters={handleResetFilters}
+    />
 
       {/* =================================================================== */}
       {/* MAIN DASHBOARD CONTENT AREA                                        */}
@@ -240,16 +78,14 @@ export default function DashboardPage() {
         {/* Row 1: KPI Cards + Sparklines */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
           {METRICS_CONFIG.map(({ key, label }) => (
-            <div key={key} style={{ backgroundColor: '#FFFFFF', padding: '16px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-              <KpiSparkline
-                dfFull={dimFilteredDf}
-                dfFiltered={fullyFilteredDf}
-                metricCol={key}
-                title={label}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </div>
+            <KpiSparkline
+              dfFull={dimFilteredDf}
+              dfFiltered={fullyFilteredDf}
+              metricCol={key}
+              title={label}
+              startDate={startDate}
+              endDate={endDate}
+            />
           ))}
         </div>
 
