@@ -18,6 +18,7 @@ export function TrendChart({
   , endDate
   , onPointSelect 
   , metricsConfig
+  , onMetricChange
 }) {
   
   const chartData = useTrendChartData({ dfFull, dfFiltered, metricCol });
