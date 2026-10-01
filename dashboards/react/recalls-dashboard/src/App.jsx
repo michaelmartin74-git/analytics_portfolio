@@ -78,7 +78,9 @@ export default function DashboardPage() {
         {/* Row 1: KPI Cards + Sparklines */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
           {METRICS_CONFIG.map(({ key, label }) => (
+            
             <KpiSparkline
+              key={key}
               dfFull={dimFilteredDf}
               dfFiltered={fullyFilteredDf}
               metricCol={key}
@@ -86,6 +88,7 @@ export default function DashboardPage() {
               startDate={startDate}
               endDate={endDate}
             />
+
           ))}
         </div>
 
@@ -93,29 +96,18 @@ export default function DashboardPage() {
 
         {/* Row 2: Trend Line Chart */}
         <div style={{ backgroundColor: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid #E2E8F0', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', letterSpacing: '0.05em' }}>
-              HISTORICAL TREND ANALYSIS
-            </span>
-            <select
-              value={activeMetricCol}
-              onChange={(e) => setActiveMetricCol(e.target.value)}
-              style={{ padding: '6px 12px', border: '1px solid #CBD5E1', borderRadius: '4px', fontSize: '0.85rem' }}
-            >
-              {METRICS_CONFIG.map(({ key, label }) => (
-                <option key={key} value={key}>{label}</option>
-              ))}
-            </select>
-          </div>
 
           <TrendChart
             dfFull={dimFilteredDf}
             dfFiltered={fullyFilteredDf}
             metricCol={activeMetricCol}
+            onMetricChange={setActiveMetricCol}
+            metricsConfig={METRICS_CONFIG}
             startDate={startDate}
             endDate={endDate}
             onPointSelect={(date) => setSelectedChartDate(date)}
           />
+
         </div>
 
         <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '24px 0' }} />
