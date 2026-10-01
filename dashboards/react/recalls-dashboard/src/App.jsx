@@ -5,6 +5,7 @@ import { KpiSparkline } from './components/KpiSparkline';
 import { TrendChart } from './components/TrendChart';
 import { DrilldownTable } from './components/DrilldownTable';
 import { SegmentedTable } from './components/SegmentedTable';
+import { SectionDivider } from './components/SectionDivider';
 import { toISODate } from './utils/formatters';
 import { Sidebar } from './components/Sidebar';
 
@@ -92,25 +93,21 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '24px 0' }} />
+        <SectionDivider />
 
         {/* Row 2: Trend Line Chart */}
-        <div style={{ backgroundColor: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid #E2E8F0', marginBottom: '24px' }}>
+        <TrendChart
+          dfFull={dimFilteredDf}
+          dfFiltered={fullyFilteredDf}
+          metricCol={activeMetricCol}
+          onMetricChange={setActiveMetricCol}
+          metricsConfig={METRICS_CONFIG}
+          startDate={startDate}
+          endDate={endDate}
+          onPointSelect={(date) => setSelectedChartDate(date)}
+        />
 
-          <TrendChart
-            dfFull={dimFilteredDf}
-            dfFiltered={fullyFilteredDf}
-            metricCol={activeMetricCol}
-            onMetricChange={setActiveMetricCol}
-            metricsConfig={METRICS_CONFIG}
-            startDate={startDate}
-            endDate={endDate}
-            onPointSelect={(date) => setSelectedChartDate(date)}
-          />
-
-        </div>
-
-        <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '24px 0' }} />
+        <SectionDivider />
 
         {/* Row 3: Drill-Down Detail Table */}
         <DrilldownTable
@@ -119,23 +116,15 @@ export default function DashboardPage() {
           onClearSelection={() => setSelectedChartDate(null)}
         />
 
-        <hr style={{ border: 'none', borderTop: '1px solid #E2E8F0', margin: '24px 0' }} />
+        <SectionDivider />
 
         {/* Row 4: Year x Month Matrix */}
-        <div style={{ backgroundColor: '#FFFFFF', padding: '20px', borderRadius: '8px', border: '1px solid #E2E8F0', marginBottom: '24px' }}>
-          <div style={{ marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', letterSpacing: '0.05em' }}>
-              YEAR OVER MONTH MATRIX
-            </span>
-          </div>
-
-          <SegmentedTable
-            dfFull={dimFilteredDf}
-            metricCol={activeMetricCol}
-            startDate={startDate}
-            endDate={endDate}
-          />
-        </div>
+        <SegmentedTable
+          dfFull={dimFilteredDf}
+          metricCol={activeMetricCol}
+          startDate={startDate}
+          endDate={endDate}
+        />
 
         {/* Footer Metadata */}
         <div style={{ fontSize: '0.8rem', color: '#94A3B8', textAlign: 'center', marginTop: '32px' }}>
