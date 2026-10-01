@@ -1,90 +1,37 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import {
-  KpiSparkline,
-  TrendChart,
-  SegmentedTable,
-  DrilldownTable,
-} from './DashboardComponents';
-import DbtDocsButton from './DbtDocsButton';
+import { useDashboardData } from './hooks/useDashboardData';
+import { DIMENSION_FILTERS, METRICS_CONFIG } from './constants/dashboardConfig';
+import { KpiSparkline } from './components/KpiSparkline';
+import { TrendChart } from './components/TrendChart';
+import { DrilldownTable } from './components/DrilldownTable';
+import { SegmentedTable } from './components/SegmentedTable';
+import { toISODate } from './utils/formatters';
 
-// ==============================================================================
-// 1. CONFIGURATION & CONSTANTS
-// ==============================================================================
-const DIMENSION_FILTERS = [
-  { key: 'class', label: 'Class' },
-  { key: 'status', label: 'Status' },
-  { key: 'reason_category', label: 'Reason Category' },
-  { key: 'recalling_firm', label: 'Recalling Firm' },
-  { key: 'geo_state', label: 'Geo State' },
-  { key: 'geo_city', label: 'Geo City' },
-];
-
-const METRICS_CONFIG = [
-  { key: 'recalls', label: 'Total Recalls' },
-  { key: 'firms', label: 'Affected Firms' },
-  { key: 'avg_init_to_class_days', label: 'Avg Init-to-Class (Days)' },
-  { key: 'avg_class_to_term_days', label: 'Avg Class-to-Term (Days)' },
-];
-
-// Helper to convert JS Date to YYYY-MM-DD
-const toISODate = (d) => d.toISOString().split('T')[0];
 
 export default function DashboardPage() {
-  // Raw JSON dataset fetched from API/static file
-  const [rawData, setRawData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Filter States
-  const [preset, setPreset] = useState('Current Year');
-  const [customStartDate, setCustomStartDate] = useState('');
-  const [customEndDate, setCustomEndDate] = useState('');
-  const [dimensionFilters, setDimensionFilters] = useState({
-    class: 'All',
-    status: 'All',
-    reason_category: 'All',
-    recalling_firm: 'All',
-    geo_state: 'All',
-    geo_city: 'All',
-  });
-
-  // UI Interactive States
-  const [activeMetricCol, setActiveMetricCol] = useState('recalls');
-  const [selectedChartDate, setSelectedChartDate] = useState(null);
-
-  // Sidebar Show/Hide Feature
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // ==============================================================================
-  // 2. DATA FETCHING (Simulates Streamlit Parquet/DuckDB Loader)
-  // ==============================================================================
-useEffect(() => {
-  // Relative URL path — works locally AND on a live public website
-  //fetch('/data/agg_recalls_data.json')
-  fetch(`${import.meta.env.BASE_URL}data/agg_recalls_data.json`)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
-      return res.json();
-    })
-    .then((data) => {
-      setRawData(data);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error('Error loading static JSON dataset:', err);
-      setLoading(false);
-    });
-}, []);
-
-  // Global Date Bounds calculated from full dataset
-  const { minDataDate, maxDataDate } = useMemo(() => {
-    if (!rawData.length) return { minDataDate: '', maxDataDate: '' };
-    const dates = rawData.map((d) => new Date(d.date)).filter((d) => !isNaN(d));
-    const min = new Date(Math.min(...dates));
-    const max = new Date(Math.max(...dates));
-    return { minDataDate: toISODate(min), maxDataDate: toISODate(max) };
-  }, [rawData]);
+  const {
+    loading,
+    rawData,
+    filteredData,
+    minDataDate,
+    maxDataDate,
+    preset,
+    setPreset,
+    customStartDate,
+    setCustomStartDate,
+    customEndDate,
+    setCustomEndDate,
+    dimensionFilters,
+    setDimensionFilters,
+    handleDimensionChange,
+    resetFilters,
+    activeMetricCol,
+    setActiveMetricCol,
+    selectedChartDate,
+    setSelectedChartDate,
+    isSidebarOpen,
+    setIsSidebarOpen,
+  } = useDashboardData();
 
   // ==============================================================================
   // 3. DATE RANGE PRESET LOGIC
@@ -182,11 +129,6 @@ useEffect(() => {
       return d >= s && d <= e;
     });
   }, [dimFilteredDf, startDate, endDate]);
-
-  // Handlers
-  const handleDimensionChange = (key, value) => {
-    setDimensionFilters((prev) => ({ ...prev, [key]: value }));
-  };
 
   const handleResetFilters = () => {
     setPreset('Current Year');
