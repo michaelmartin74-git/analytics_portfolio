@@ -6,6 +6,8 @@ export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', '
 export function useSeasonalityMatrix(dfFull = [], metricCol, startDate, endDate) {
   const [viewMode, setViewMode] = useState('totals'); // 'totals' | 'mom'
 
+  const isAvgMetric = metricCol?.toUpperCase().includes('AVG');
+
   // Determine active date boundary limits for styling/opacity filters
   const rangeBounds = useMemo(() => {
     if (!startDate || !endDate) return null;
@@ -20,30 +22,51 @@ export function useSeasonalityMatrix(dfFull = [], metricCol, startDate, endDate)
 
   // Transform raw row records into an aggregated Year x Month grid
   const { matrix, years, maxVal } = useMemo(() => {
-    const grid = {};
-    const yearSet = new Set();
-    let max = 0;
+      // Intermediate storage to hold sum and count per month
+      const totalsGrid = {};
+      const countsGrid = {};
+      const yearSet = new Set();
 
-    dfFull.forEach((row) => {
-      if (!row.date) return;
-      const d = parseLocalDate(row.date);
-      if (!d || isNaN(d.getTime())) return;
+      dfFull.forEach((row) => {
+        if (!row.date) return;
+        const d = parseLocalDate(row.date);
+        if (!d || isNaN(d.getTime())) return;
 
-      const year = d.getFullYear();
-      const monthIdx = d.getMonth();
-      const val = Number(row[metricCol]) || 0;
+        const year = d.getFullYear();
+        const monthIdx = d.getMonth();
+        const val = Number(row[metricCol]) || 0;
 
-      yearSet.add(year);
+        yearSet.add(year);
 
-      if (!grid[year]) grid[year] = Array(12).fill(0);
-      grid[year][monthIdx] += val;
+        if (!totalsGrid[year]) {
+          totalsGrid[year] = Array(12).fill(0);
+          countsGrid[year] = Array(12).fill(0);
+        }
 
-      if (grid[year][monthIdx] > max) max = grid[year][monthIdx];
-    });
+        totalsGrid[year][monthIdx] += val;
+        if (val > 0) countsGrid[year][monthIdx] += 1;
+      });
 
-    const sortedYears = Array.from(yearSet).sort((a, b) => b - a);
-    return { matrix: grid, years: sortedYears, maxVal: max };
-  }, [dfFull, metricCol]);
+      const finalGrid = {};
+      let max = 0;
+
+      // Calculate final monthly value (SUM vs AVG)
+      Object.keys(totalsGrid).forEach((yr) => {
+        finalGrid[yr] = Array(12).fill(0);
+        for (let m = 0; m < 12; m++) {
+          const total = totalsGrid[yr][m];
+          const count = countsGrid[yr][m];
+
+          const monthVal = isAvgMetric ? (count > 0 ? total / count : 0) : total;
+          finalGrid[yr][m] = monthVal;
+
+          if (monthVal > max) max = monthVal;
+        }
+      });
+
+      const sortedYears = Array.from(yearSet).sort((a, b) => b - a);
+      return { matrix: finalGrid, years: sortedYears, maxVal: max };
+    }, [dfFull, metricCol, isAvgMetric]);
 
   // Helper to retrieve prior period's metric value across year boundaries
   const getPriorMonthVal = (year, monthIdx) => {

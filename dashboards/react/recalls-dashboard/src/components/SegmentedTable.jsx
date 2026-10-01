@@ -88,13 +88,24 @@ export function SegmentedTable({ dfFull = [], metricCol, startDate, endDate }) {
                 {MONTHS.map((m) => (
                   <th key={m} style={{ padding: '8px' }}>{m}</th>
                 ))}
-                <th style={{ padding: '8px', borderLeft: '1px solid #E2E8F0', fontWeight: 700 }}>Total</th>
+                <th style={{ padding: '8px', borderLeft: '1px solid #E2E8F0', fontWeight: 700 }}>
+                  {metricCol?.toUpperCase().includes('AVG') ? 'Average' : 'Total'}
+                </th>
               </tr>
             </thead>
             <tbody>
               {years.length > 0 ? (
                 years.map((yr) => {
-                  const annualTotal = matrix[yr].reduce((sum, v) => sum + v, 0);
+                  const isAvgMetric = metricCol?.toUpperCase().includes('AVG');
+
+                  // Filter active/valid non-zero values for average calculation
+                  const validValues = matrix[yr].filter((v) => v > 0);
+
+                  const summaryVal = isAvgMetric
+                    ? validValues.length > 0
+                      ? validValues.reduce((sum, v) => sum + v, 0) / validValues.length
+                      : 0
+                    : matrix[yr].reduce((sum, v) => sum + v, 0);
 
                   return (
                     <tr key={yr} style={{ borderBottom: '1px solid #F1F5F9' }}>
@@ -133,7 +144,7 @@ export function SegmentedTable({ dfFull = [], metricCol, startDate, endDate }) {
                         );
                       })}
 
-                      {/* Annual Row Total */}
+                      {/* Annual Row Total/Average */}
                       <td
                         style={{
                           padding: '8px',
@@ -143,7 +154,7 @@ export function SegmentedTable({ dfFull = [], metricCol, startDate, endDate }) {
                           backgroundColor: '#F8FAFC',
                         }}
                       >
-                        {annualTotal > 0 ? formatMetricValue(annualTotal, metricCol) : '-'}
+                        {summaryVal > 0 ? formatMetricValue(summaryVal, metricCol) : '-'}
                       </td>
                     </tr>
                   );
