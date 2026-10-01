@@ -1,5 +1,5 @@
 import { ResponsiveContainer, AreaChart, Area, Tooltip } from 'recharts';
-import { useKpiData } from '../hooks/useKpiData';
+import { useKpiData } from '../hooks/useKPIData';
 import { formatDateLabel, formatMetricValue } from '../utils/formatters';
 
 export function KpiSparkline({ dfFull = [], dfFiltered = [], metricCol, title, startDate, endDate }) {
