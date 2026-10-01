@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { INITIAL_DIMENSION_STATE } from '../constants/dashboardConfig';
-import { toISODate } from '../utils/formatters';
+import { resolveBounds } from '../utils/dateUtils';
 
 export function useDashboardData() {
   // Raw Data State
@@ -24,6 +24,9 @@ export function useDashboardData() {
       try {
         setLoading(true);
         const res = await fetch(`${import.meta.env.BASE_URL}data/agg_recalls_data.json`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
         const json = await res.json();
         setRawData(json);
       } catch (err) {
@@ -47,26 +50,73 @@ export function useDashboardData() {
     setSelectedChartDate(null);
   };
 
-  // Ensure this memoized block includes your full original date filter logic
+  // 1. Dataset Min/Max Bounds
+  const { startDate: minDataDate, endDate: maxDataDate } = useMemo(() => {
+    return resolveBounds(rawData);
+  }, [rawData]);
+
+  // 2. Active Date Range based on Preset / Custom Dates
+  const { startDate, endDate } = useMemo(() => {
+    if (!rawData.length) return { startDate: '', endDate: '' };
+
+    switch (preset) {
+      case 'Last Month':
+        return resolveBounds(
+          rawData.filter((d) => d.months_ago === 1),
+          minDataDate,
+          maxDataDate
+        );
+      case 'Last 6 Months':
+        return resolveBounds(
+          rawData.filter((d) => d.months_ago >= 1 && d.months_ago <= 6),
+          minDataDate,
+          maxDataDate
+        );
+      case 'Current Year':
+        return resolveBounds(
+          rawData.filter((d) => d.years_ago === 0),
+          minDataDate,
+          maxDataDate
+        );
+      case 'Last Year':
+        return resolveBounds(
+          rawData.filter((d) => d.years_ago === 1),
+          minDataDate,
+          maxDataDate
+        );
+      case 'All Time':
+        return { startDate: minDataDate, endDate: maxDataDate };
+      case 'Custom':
+        return {
+          startDate: customStartDate || minDataDate,
+          endDate: customEndDate || maxDataDate,
+        };
+      default:
+        return resolveBounds(
+          rawData.filter((d) => d.years_ago === 0),
+          minDataDate,
+          maxDataDate
+        );
+    }
+  }, [preset, rawData, minDataDate, maxDataDate, customStartDate, customEndDate]);
+
+  // 3. Derived Filtered Data (Dimensions + Date Range)
   const filteredData = useMemo(() => {
     if (!rawData.length) return [];
 
     return rawData.filter((row) => {
+      // Dimension Filtering
       for (const [key, val] of Object.entries(dimensionFilters)) {
         if (val !== 'All' && row[key] !== val) return false;
       }
+
+      // Date Range Filtering
+      if (startDate && row.date < startDate) return false;
+      if (endDate && row.date > endDate) return false;
+
       return true;
     });
-  }, [rawData, dimensionFilters, preset, customStartDate, customEndDate]);
-
-  // Global Date Bounds calculated from full dataset
-  const { minDataDate, maxDataDate } = useMemo(() => {
-    if (!rawData.length) return { minDataDate: '', maxDataDate: '' };
-    const dates = rawData.map((d) => new Date(d.date)).filter((d) => !isNaN(d));
-    const min = new Date(Math.min(...dates));
-    const max = new Date(Math.max(...dates));
-    return { minDataDate: toISODate(min), maxDataDate: toISODate(max) };
-  }, [rawData]);
+  }, [rawData, dimensionFilters, startDate, endDate]);
 
   return {
     loading,
@@ -75,6 +125,8 @@ export function useDashboardData() {
     filteredData,
     minDataDate,
     maxDataDate,
+    startDate,
+    endDate,
     preset,
     setPreset,
     customStartDate,

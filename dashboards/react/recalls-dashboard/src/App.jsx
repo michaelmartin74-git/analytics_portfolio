@@ -15,6 +15,8 @@ export default function DashboardPage() {
     filteredData,
     minDataDate,
     maxDataDate,
+    startDate,
+    endDate,
     preset,
     setPreset,
     customStartDate,
@@ -32,44 +34,6 @@ export default function DashboardPage() {
     isSidebarOpen,
     setIsSidebarOpen,
   } = useDashboardData();
-
-  // ==============================================================================
-  // 3. DATE RANGE PRESET LOGIC
-  // ==============================================================================
-  const { startDate, endDate } = useMemo(() => {
-    if (!rawData.length) return { startDate: '', endDate: '' };
-
-    const resolveBounds = (subset) => {
-      if (!subset.length) return { startDate: minDataDate, endDate: maxDataDate };
-      const dates = subset.map((d) => new Date(d.date));
-      return {
-        startDate: toISODate(new Date(Math.min(...dates))),
-        endDate: toISODate(new Date(Math.max(...dates))),
-      };
-    };
-
-    switch (preset) {
-      case 'Last Month':
-        return resolveBounds(rawData.filter((d) => d.months_ago === 1));
-      case 'Last 6 Months':
-        return resolveBounds(
-          rawData.filter((d) => d.months_ago >= 1 && d.months_ago <= 6)
-        );
-      case 'Current Year':
-        return resolveBounds(rawData.filter((d) => d.years_ago === 0));
-      case 'Last Year':
-        return resolveBounds(rawData.filter((d) => d.years_ago === 1));
-      case 'All Time':
-        return { startDate: minDataDate, endDate: maxDataDate };
-      case 'Custom':
-        return {
-          startDate: customStartDate || minDataDate,
-          endDate: customEndDate || maxDataDate,
-        };
-      default:
-        return resolveBounds(rawData.filter((d) => d.years_ago === 0));
-    }
-  }, [preset, rawData, minDataDate, maxDataDate, customStartDate, customEndDate]);
 
   // ==============================================================================
   // 4. DYNAMIC CROSS-FILTERING PIPELINE
