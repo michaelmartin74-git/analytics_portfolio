@@ -1,5 +1,8 @@
 name: dbt Daily & Weekly Refresh
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: '0 17 * * *'
@@ -65,6 +68,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No data changes detected to commit."
           else
-            git commit -m "auto: update exported parquet and dashboard JSON files [skip ci]"
-            git push
+            git commit -m "auto: update exported parquet and dashboard JSON files"
+            git push origin HEAD:${{ github.ref_name }}
           fi
