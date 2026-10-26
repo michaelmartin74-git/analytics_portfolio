@@ -60,6 +60,8 @@ jobs:
           python scripts/agg_recalls_export_to_json.py
 
       - name: Commit and Push Updated Data Files
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
