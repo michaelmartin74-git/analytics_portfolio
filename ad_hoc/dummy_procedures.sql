@@ -56,13 +56,7 @@ with
 , condition_occurrence as (
   select
     *
-  , cast(format_date('%Y%m%d', condition_start_date) as int64) as adm_date_sk
-  , cast(format_date('%Y%m%d', condition_end_date) as int64) as dsch_date_sk 
   from bigquery-public-data.cms_synthetic_patient_data_omop.condition_occurrence
-)
-
-, concept_class as (
-  select * from bigquery-public-data.cms_synthetic_patient_data_omop.concept_class
 )
 
 , dim_date as (
