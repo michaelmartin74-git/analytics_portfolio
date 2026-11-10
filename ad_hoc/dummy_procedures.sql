@@ -39,6 +39,7 @@ with
       day
   ) as days_since_last_procedure
    from bigquery-public-data.cms_synthetic_patient_data_omop.procedure_occurrence
+   --where visit_occurrence_id = 105629301 -- for testing
 )
 
 , location as (
@@ -102,8 +103,6 @@ with
     on pat_expiry.person_id = person.person_id
   left join concept death_type
     on death_type.concept_id = pat_expiry.death_type_concept_id
-  -- left join concept cause_of_death
-  --   on cause_of_death.concept_id = pat_expiry.cause_concept_id --no data
 )
 
 , dim_date_enriched as (
@@ -186,21 +185,18 @@ with
   , condition_occurrence.condition_start_date as adm_date
   , condition_occurrence.condition_end_date as dsch_date
   , proc_event.procedure_dat as proc_date
-  , proc_type.concept_name as proc_type_name
-  , proc_type.vocabulary_id as proc_type_vocabulary_id
   , proc_event.procedure_seq_num
-  , proc_event.procedure_source_value --? cpt desc
-  , proc_event.procedure_source_concept_id --?
-  , proc_event.procedure_occurrence_id --?
-  , proc_event.procedure_concept_id
-  , proc.concept_name as proc_name
-  , proc.vocabulary_id as proc_vocabulariy_id
+  , proc.concept_code as proc_code --cpt
+  , proc.concept_name as proc_name --cpt name
+  , proc.vocabulary_id as proc_vocabulariy_id --cpt type
   , care_site.care_site_name
   , care_site.care_site_source_value
   , care_site.place_of_service_source_value
 
   -- days since last procedure
+  , prev_proc.concept_code as prev_proc_code
   , prev_proc.concept_name as prev_proc_name
+  , prev_proc.vocabulary_id as prev_proc_vocabulary_id
   , proc_event.prev_procedure_date
   , proc_event.days_since_last_procedure
 
@@ -246,10 +242,10 @@ with
   left join concept proc_type
     on proc_type.concept_id = proc_event.procedure_type_concept_id
     and proc_type.domain_id = 'Type Concept'
-  left join condition_occurrence
-    on condition_occurrence.visit_occurrence_id = proc_event.visit_occurrence_id
   left join concept prev_proc
     on prev_proc.concept_id = proc_event.prev_procedure_concept_id
+  left join condition_occurrence
+    on condition_occurrence.visit_occurrence_id = proc_event.visit_occurrence_id
   left join prov_volumes_ranked
     on prov_volumes_ranked.provider_id = proc_event.provider_id
   where 1 = 1
@@ -258,9 +254,10 @@ with
 )
 
 select 
-* 
+ *
 from final
 ;
 
 -- original rowcount: 82327, ~5s (just proc_event)
 -- final rowcount: 82327, 22s
+-- final rowcount: 82327, 22s (11/9/26)
