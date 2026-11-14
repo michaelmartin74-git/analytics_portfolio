@@ -88,7 +88,7 @@ with
 , completed_visits AS (
     /* Synthetic completed patient visits (stored as minutes from midnight) */
     select 
-      /* Monday 8:00 - 11:00 (Utilized) */
+      /* Monday 8:00 - 11:13 (Utilized) */
       1234567 as visit_no
     , cast('2026-06-01' as date) as service_date
     , 480 as proc_start_min
@@ -106,7 +106,7 @@ with
     union all
 
     select 
-        /* Wednesday 11:00 - 1:00 (Utilized part of Wed slot) */
+        /* Wednesday 6:00 - 1:00 (Utilized part of Wed slot) */
       3456789 as visit_no  
     , cast('2026-06-03' as date)
     , 360
