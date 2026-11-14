@@ -27,7 +27,7 @@ def format_dataset_name(stem: str) -> str:
     else:
         return stem.replace('_', ' ').title()
 
-def generate_research_codebook_from_csv(path_input: str, output_html_path: str = "dataset_codebook.html"):
+def generate_research_codebook_from_csv(path_input: str, output_html_path: str = "profile_summary.html"):
     """
     Ingests a local CSV file or scans a folder path for a CSV,
     computes schema profiles and missingness, and outputs a clean 
@@ -150,6 +150,12 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
                 border-radius: 6px;
             }}
             
+            /* Vertical and horizontal scrollable container for long tables */
+            .table-container.scrollable-table {{
+                max-height: 420px; /* Roughly 10 rows + header */
+                overflow-y: auto;  /* Enable vertical scrolling */
+            }}
+            
             table {{ border-collapse: collapse; width: max-content; min-width: 100%; font-size: 14px; }}
             th, td {{ border: 1px solid #ddd; padding: 10px 16px; text-align: left; white-space: nowrap; }}
             th {{ background-color: #f8f9fa; position: sticky; top: 0; }}
@@ -166,7 +172,7 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
         </div>
 
         <h2>Column Schema & Completeness</h2>
-        <div class="table-container">
+        <div class="table-container scrollable-table">
             {profile_html}
         </div>
 
@@ -188,6 +194,12 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
 
 # Example execution:
 if __name__ == "__main__":
-    # Paste your folder path or file path here:
-    generate_research_codebook_from_csv(r"C:\Users\joann\Downloads\dummy_procedure_visits.csv")
-    pass
+    # Automatically get the folder where this script is saved
+    script_dir = Path(__file__).parent
+    
+    # Point to the CSV relative to the script's location
+    target_csv = script_dir / "dummy_procedure_visits.csv"
+    output_html = script_dir / "profile_summary.html"
+    
+    # Run the generator, passing the explicit output path
+    generate_research_codebook_from_csv(target_csv, output_html_path=str(output_html))
