@@ -5,7 +5,10 @@ with
 /* Import Layer: land source tables and add surrogate keys when needed for eventual runtime optimization */
 
  person as (
-  select * from bigquery-public-data.cms_synthetic_patient_data_omop.person
+  select 
+   * 
+  , date(person.year_of_birth, person.month_of_birth, person.day_of_birth) as pat_dob
+ from bigquery-public-data.cms_synthetic_patient_data_omop.person
  )
 
  , pat_expiry as (
@@ -87,11 +90,11 @@ with
   , person.gender_source_value as pat_gender
   , person.race_source_value as pat_race
   , person.ethnicity_source_value as pat_ethnicity
-  , date(person.year_of_birth, person.month_of_birth, person.day_of_birth) as pat_dob
+  , person.pat_dob
   , date_diff(
       --resolves age as of now or at time of death
       coalesce(pat_expiry.death_date, current_date()),
-      date(person.year_of_birth, person.month_of_birth, person.day_of_birth), 
+      person.pat_dob, 
       year
     ) AS pat_age
   , case when pat_expiry.death_date is not null then 1 else 0 end as pat_expired
