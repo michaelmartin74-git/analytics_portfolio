@@ -113,7 +113,15 @@ with
     , 780      
 )
 
-, final as (
+, ranked_visits as (
+  /* Sequences visits per business day for flagging on-time-starts (critical for keeping rest of day on schedule) */
+  select
+   *
+  , dense_rank() over (partition by service_date order by proc_start_min) as visit_seq_per_day
+  from completed_visits
+)
+
+, scheduled_vs_actual_visits as (
     /* Measure slot vs. business day usage */
     select 
       s.business_date
@@ -127,59 +135,77 @@ with
             else 0
         end as utilized_flag
     , v.visit_no
-    , min(timestamp(datetime_add(cast(s.business_date as datetime), interval s.slot_start_min minute), 'America/Denver')) 
-      over (partition by s.business_date) as clinic_start_datetime
-    , max(timestamp(datetime_add(cast(s.business_date as datetime), interval s.slot_end_min minute), 'America/Denver')) 
-      over (partition by s.business_date) as clinic_end_datetime
-    , timestamp(datetime_add(cast(s.business_date as datetime), interval v.proc_start_min minute), 'America/Denver') as proc_start_datetime
-    , timestamp(datetime_add(cast(s.business_date as datetime), interval v.proc_end_min minute), 'America/Denver') as proc_end_datetime
+    , min(
+        case 
+          when scheduled_flag = 1 
+          then datetime_add(cast(s.business_date as datetime), interval s.slot_start_min minute)
+        end
+      ) over (partition by s.business_date) as clinic_start_datetime
+    , max(
+        case 
+          when scheduled_flag = 1 
+          then datetime_add(cast(s.business_date as datetime), interval s.slot_end_min minute)
+        end
+      ) over (partition by s.business_date) as clinic_end_datetime
+    , datetime_add(cast(s.business_date as datetime), interval v.proc_start_min minute) as proc_start_datetime
+    , datetime_add(cast(s.business_date as datetime), interval v.proc_end_min minute) as proc_end_datetime
     , v.proc_end_min - v.proc_start_min as proc_elap_mins
     , greatest(
         0
       , least(s.slot_end_min, v.proc_end_min) - greatest(s.slot_start_min, v.proc_start_min)
       ) as slot_elap_mins
     , case 
-        /* on-time category (within 0-5 mins of slot start)*/
-        when v.visit_no is null then null
-        when v.proc_start_min - min(s.slot_start_min) over (partition by v.visit_no) between 0 and 5 then 'on-time'
-        when v.proc_start_min - min(s.slot_start_min) over (partition by v.visit_no) < 0 then 'early'
-        else 'late-start'
-        end as on_time_category 
-    , case 
         when v.visit_no is null then null 
         else s.time_of_day_category 
         end as time_of_day_category
+    , v.visit_seq_per_day
     from scheduled_slots s
-    left join completed_visits v
+    left join ranked_visits v
         on s.business_date = v.service_date
         and v.proc_start_min < s.slot_end_min
         and v.proc_end_min > s.slot_start_min
 )
 
-select 
-* 
-, case 
-    when scheduled_flag = 1
-     and utilized_flag = 0
-     then 30
-     end as unused_sched_slot_mins
-, case 
-    /* Assertion - Elapsed Mins Harmony: Proc elap = sum total slot elap mins */
-    when visit_no is null then null
-    when sum(slot_elap_mins) over (partition by visit_no) <> proc_elap_mins then 1
-    else 0 
-    end as mismatched_elap_time_flag
-, case 
-    /* Assertion - Sequential Timestamps: no negative procedure or slot elapsed times */
-    when visit_no is null then null
-    when proc_elap_mins < 0 then 1
-    when slot_elap_mins < 0 then 1
-    else 0
-    end as negative_elap_mins_flag
-from final
-where scheduled_flag = 1 
-or slot_elap_mins is not null
-order by 
-    business_date
-  , time_slot
+, final as (
+    select 
+    * 
+    , case 
+      /* on-time category (within 0-5 mins of slot start)*/
+        when visit_seq_per_day = 1
+         then (
+          case 
+            when date_diff(proc_start_datetime, clinic_start_datetime, minute) between 0 and 5 then 'on-time'
+            when date_diff(proc_start_datetime, clinic_start_datetime, minute) > 5 then 'late'
+            else 'early'
+            end
+            )
+        end as first_start_accuracy_category
+    , case 
+        when scheduled_flag = 1
+        and utilized_flag = 0
+        then 30
+        end as unused_sched_slot_mins
+    , case 
+        /* Assertion - Elapsed Mins Harmony: Proc elap = sum total slot elap mins */
+        when visit_no is null then null
+        when sum(slot_elap_mins) over (partition by visit_no) <> proc_elap_mins then 1
+        else 0 
+        end as mismatched_elap_time_flag
+    , case 
+        /* Assertion - Sequential Timestamps: no negative procedure or slot elapsed times */
+        when visit_no is null then null
+        when proc_elap_mins < 0 then 1
+        when slot_elap_mins < 0 then 1
+        else 0
+        end as negative_elap_mins_flag
+    from scheduled_vs_actual_visits
+    where scheduled_flag = 1 
+    or slot_elap_mins is not null
+    order by 
+        business_date
+      , time_slot
+
+)
+
+select * from final
 ;
