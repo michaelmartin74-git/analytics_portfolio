@@ -17,6 +17,12 @@
                 border-radius: 6px;
             }
             
+            /* Vertical and horizontal scrollable container for long tables */
+            .table-container.scrollable-table {
+                max-height: 420px; /* Roughly 10 rows + header */
+                overflow-y: auto;  /* Enable vertical scrolling */
+            }
+            
             table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 14px; }
             th, td { border: 1px solid #ddd; padding: 10px 16px; text-align: left; white-space: nowrap; }
             th { background-color: #f8f9fa; position: sticky; top: 0; }
@@ -27,13 +33,13 @@
         <div class="metadata-box">
             <p><strong>Dataset Name:</strong> Dummy Procedure Visits</p>
             <p><strong>Source File:</strong> dummy_procedure_visits.csv</p>
-            <p><strong>Generated At:</strong> 2026-11-14 16:15:09</p>
+            <p><strong>Generated At:</strong> 2026-11-14 16:40:16</p>
             <p><strong>Total Rows:</strong> 14408 | <strong>Total Columns:</strong> 54</p>
             <p><strong>Detected Date Span:</strong> 2010-12-01 to 2010-12-01 (via proc_date)</p>
         </div>
 
         <h2>Column Schema & Completeness</h2>
-        <div class="table-container">
+        <div class="table-container scrollable-table">
             <table border="1" class="dataframe table table-bordered">
   <thead>
     <tr style="text-align: right;">
