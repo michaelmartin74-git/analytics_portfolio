@@ -1,0 +1,1107 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Dataset Codebook: Dummy Procedure Visits</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; color: #333; }
+            h1, h2 { color: #111; }
+            .metadata-box { background: #f4f4f6; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+            
+            /* Responsive scrollable wrapper for wide tables */
+            .table-container {
+                width: 100%;
+                overflow-x: auto;
+                margin-bottom: 30px;
+                border: 1px solid #e1e4e8;
+                border-radius: 6px;
+            }
+            
+            table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 14px; }
+            th, td { border: 1px solid #ddd; padding: 10px 16px; text-align: left; white-space: nowrap; }
+            th { background-color: #f8f9fa; position: sticky; top: 0; }
+        </style>
+    </head>
+    <body>
+        <h1>Data Profile</h1>
+        <div class="metadata-box">
+            <p><strong>Dataset Name:</strong> Dummy Procedure Visits</p>
+            <p><strong>Source File:</strong> dummy_procedure_visits.csv</p>
+            <p><strong>Generated At:</strong> 2026-11-14 16:15:09</p>
+            <p><strong>Total Rows:</strong> 14408 | <strong>Total Columns:</strong> 54</p>
+            <p><strong>Detected Date Span:</strong> 2010-12-01 to 2010-12-01 (via proc_date)</p>
+        </div>
+
+        <h2>Column Schema & Completeness</h2>
+        <div class="table-container">
+            <table border="1" class="dataframe table table-bordered">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Column</th>
+      <th>Type</th>
+      <th>Non-Null Count</th>
+      <th>Null Count</th>
+      <th>Null %</th>
+      <th>Min</th>
+      <th>25th Perc.</th>
+      <th>Median</th>
+      <th>Avg</th>
+      <th>75th Perc</th>
+      <th>Max</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>mrn</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>15</td>
+      <td>595063.5</td>
+      <td>1184919.5</td>
+      <td>1177005.852443</td>
+      <td>1763165.5</td>
+      <td>2326765</td>
+    </tr>
+    <tr>
+      <td>pat_name</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>pat_loc_zip</td>
+      <td>float64</td>
+      <td>0</td>
+      <td>14408</td>
+      <td>100.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>pat_loc_county</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1000</td>
+      <td>11370.0</td>
+      <td>25160.0</td>
+      <td>25957.904567</td>
+      <td>38250.0</td>
+      <td>54999</td>
+    </tr>
+    <tr>
+      <td>pat_loc_city</td>
+      <td>float64</td>
+      <td>0</td>
+      <td>14408</td>
+      <td>100.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>pat_loc_state</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>pat_gender</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>1.582732</td>
+      <td>2.0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>pat_dob</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>pat_age</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>43</td>
+      <td>85.0</td>
+      <td>91.0</td>
+      <td>90.341963</td>
+      <td>99.0</td>
+      <td>117</td>
+    </tr>
+    <tr>
+      <td>pat_age_at_adm</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>27</td>
+      <td>69.0</td>
+      <td>75.0</td>
+      <td>74.351957</td>
+      <td>83.0</td>
+      <td>101</td>
+    </tr>
+    <tr>
+      <td>pat_expired</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000625</td>
+      <td>0.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>death_date</td>
+      <td>object</td>
+      <td>9</td>
+      <td>14399</td>
+      <td>99.94</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>expired_during_stay</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000555</td>
+      <td>0.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>death_type</td>
+      <td>object</td>
+      <td>9</td>
+      <td>14399</td>
+      <td>99.94</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>visit_no</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>730</td>
+      <td>28542061.75</td>
+      <td>56835976.5</td>
+      <td>56463768.677193</td>
+      <td>84580854.25</td>
+      <td>111633846</td>
+    </tr>
+    <tr>
+      <td>adm_date</td>
+      <td>object</td>
+      <td>12263</td>
+      <td>2145</td>
+      <td>14.89</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>dsch_date</td>
+      <td>object</td>
+      <td>12263</td>
+      <td>2145</td>
+      <td>14.89</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_date</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_type_name</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_type_vocabulary_id</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>procedure_seq_num</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>112.0</td>
+      <td>172.0</td>
+      <td>190.913243</td>
+      <td>252.0</td>
+      <td>762</td>
+    </tr>
+    <tr>
+      <td>procedure_source_value</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>procedure_source_concept_id</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2000020</td>
+      <td>2003310.0</td>
+      <td>2211361.0</td>
+      <td>5526372.948362</td>
+      <td>2414397.0</td>
+      <td>44837871</td>
+    </tr>
+    <tr>
+      <td>procedure_occurrence_id</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1882</td>
+      <td>71287881.75</td>
+      <td>141921640.0</td>
+      <td>141000272.069267</td>
+      <td>211209041.0</td>
+      <td>278758427</td>
+    </tr>
+    <tr>
+      <td>procedure_concept_id</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>0</td>
+      <td>2002987.0</td>
+      <td>2110784.0</td>
+      <td>2485948.993684</td>
+      <td>2414396.0</td>
+      <td>43561948</td>
+    </tr>
+    <tr>
+      <td>proc_name</td>
+      <td>object</td>
+      <td>14030</td>
+      <td>378</td>
+      <td>2.62</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_vocabulariy_id</td>
+      <td>object</td>
+      <td>14030</td>
+      <td>378</td>
+      <td>2.62</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>care_site_name</td>
+      <td>float64</td>
+      <td>0</td>
+      <td>14408</td>
+      <td>100.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>care_site_source_value</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>place_of_service_source_value</td>
+      <td>object</td>
+      <td>2736</td>
+      <td>11672</td>
+      <td>81.01</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>prev_proc_name</td>
+      <td>object</td>
+      <td>14401</td>
+      <td>7</td>
+      <td>0.05</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>prev_procedure_date</td>
+      <td>object</td>
+      <td>14401</td>
+      <td>7</td>
+      <td>0.05</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>days_since_last_procedure</td>
+      <td>float64</td>
+      <td>14401</td>
+      <td>7</td>
+      <td>0.05</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>10.696549</td>
+      <td>8.0</td>
+      <td>646.0</td>
+    </tr>
+    <tr>
+      <td>proc_year</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>2010</td>
+      <td>2010.0</td>
+      <td>2010.0</td>
+      <td>2010.0</td>
+      <td>2010.0</td>
+      <td>2010</td>
+    </tr>
+    <tr>
+      <td>proc_qtr</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>4</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>proc_month</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>12</td>
+      <td>12.0</td>
+      <td>12.0</td>
+      <td>12.0</td>
+      <td>12.0</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>proc_month_name</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_day_of_month</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>proc_day_of_week</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>4</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>proc_day_of_week_name</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_date_is_weekend</td>
+      <td>bool</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_date_is_weekday</td>
+      <td>bool</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_week_start_date</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_week_end_date</td>
+      <td>object</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>proc_days_ago</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>5824</td>
+      <td>5824.0</td>
+      <td>5824.0</td>
+      <td>5824.0</td>
+      <td>5824.0</td>
+      <td>5824</td>
+    </tr>
+    <tr>
+      <td>proc_weeks_ago</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>832</td>
+      <td>832.0</td>
+      <td>832.0</td>
+      <td>832.0</td>
+      <td>832.0</td>
+      <td>832</td>
+    </tr>
+    <tr>
+      <td>proc_months_ago</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>191</td>
+      <td>191.0</td>
+      <td>191.0</td>
+      <td>191.0</td>
+      <td>191.0</td>
+      <td>191</td>
+    </tr>
+    <tr>
+      <td>proc_years_ago</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>16</td>
+      <td>16.0</td>
+      <td>16.0</td>
+      <td>16.0</td>
+      <td>16.0</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <td>provider_name</td>
+      <td>float64</td>
+      <td>0</td>
+      <td>14408</td>
+      <td>100.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>npi</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>325865</td>
+      <td>2470521074.25</td>
+      <td>4967618714.5</td>
+      <td>4963616169.42636</td>
+      <td>7449540179.5</td>
+      <td>9996385755</td>
+    </tr>
+    <tr>
+      <td>specialty</td>
+      <td>float64</td>
+      <td>0</td>
+      <td>14408</td>
+      <td>100.00</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>lifetime_procedures</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>375.0</td>
+      <td>907.0</td>
+      <td>46604.43337</td>
+      <td>3195.0</td>
+      <td>1398411</td>
+    </tr>
+    <tr>
+      <td>within_specialty_rank</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>5471.0</td>
+      <td>55281.0</td>
+      <td>117224.25937</td>
+      <td>172433.0</td>
+      <td>887670</td>
+    </tr>
+    <tr>
+      <td>within_specialty_dense_rank</td>
+      <td>int64</td>
+      <td>14408</td>
+      <td>0</td>
+      <td>0.00</td>
+      <td>1</td>
+      <td>3732.0</td>
+      <td>6001.0</td>
+      <td>4793.135341</td>
+      <td>6533.0</td>
+      <td>6907</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+
+        <h2>Data Preview (First 5 Rows)</h2>
+        <div class="table-container">
+            <table border="1" class="dataframe table table-striped">
+  <thead>
+    <tr style="text-align: right;">
+      <th>mrn</th>
+      <th>pat_name</th>
+      <th>pat_loc_zip</th>
+      <th>pat_loc_county</th>
+      <th>pat_loc_city</th>
+      <th>pat_loc_state</th>
+      <th>pat_gender</th>
+      <th>pat_dob</th>
+      <th>pat_age</th>
+      <th>pat_age_at_adm</th>
+      <th>pat_expired</th>
+      <th>death_date</th>
+      <th>expired_during_stay</th>
+      <th>death_type</th>
+      <th>visit_no</th>
+      <th>adm_date</th>
+      <th>dsch_date</th>
+      <th>proc_date</th>
+      <th>proc_type_name</th>
+      <th>proc_type_vocabulary_id</th>
+      <th>procedure_seq_num</th>
+      <th>procedure_source_value</th>
+      <th>procedure_source_concept_id</th>
+      <th>procedure_occurrence_id</th>
+      <th>procedure_concept_id</th>
+      <th>proc_name</th>
+      <th>proc_vocabulariy_id</th>
+      <th>care_site_name</th>
+      <th>care_site_source_value</th>
+      <th>place_of_service_source_value</th>
+      <th>prev_proc_name</th>
+      <th>prev_procedure_date</th>
+      <th>days_since_last_procedure</th>
+      <th>proc_year</th>
+      <th>proc_qtr</th>
+      <th>proc_month</th>
+      <th>proc_month_name</th>
+      <th>proc_day_of_month</th>
+      <th>proc_day_of_week</th>
+      <th>proc_day_of_week_name</th>
+      <th>proc_date_is_weekend</th>
+      <th>proc_date_is_weekday</th>
+      <th>proc_week_start_date</th>
+      <th>proc_week_end_date</th>
+      <th>proc_days_ago</th>
+      <th>proc_weeks_ago</th>
+      <th>proc_months_ago</th>
+      <th>proc_years_ago</th>
+      <th>provider_name</th>
+      <th>npi</th>
+      <th>specialty</th>
+      <th>lifetime_procedures</th>
+      <th>within_specialty_rank</th>
+      <th>within_specialty_dense_rank</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1383317</td>
+      <td><span title="E370792A55466A4C">E370792A55466A4C</span></td>
+      <td>NaN</td>
+      <td>49750</td>
+      <td>NaN</td>
+      <td><span title="VA">VA</span></td>
+      <td>2</td>
+      <td><span title="1938-01-01">1938-01-01</span></td>
+      <td>88</td>
+      <td>72</td>
+      <td>0</td>
+      <td></td>
+      <td>0</td>
+      <td></td>
+      <td>66359266</td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="Outpatient header - 1st position">Outpatient header - 1st position</span></td>
+      <td><span title="Procedure Type">Procedure Type</span></td>
+      <td>426</td>
+      <td><span title="88305">88305</span></td>
+      <td>2213283</td>
+      <td>165706018</td>
+      <td>2213283</td>
+      <td><span title="Level IV - Surgical pathology, gross and microscopic examination Abortion - spontaneous/missed Artery, biopsy Bone marrow, biopsy Bone exostosis Brain/meninges, other than for tumor resection Breast, biopsy, not requiring microscopic evaluation of surgica">Level IV - Surgical pathology, gross and microscopic examination Abortion - spontaneous/missed Artery, biopsy Bone marrow, biopsy Bone exostosis Brain/meninges, other than for tumor resection Breast, biopsy, not requiring microscopic evaluation of surgica</span></td>
+      <td><span title="CPT4">CPT4</span></td>
+      <td>NaN</td>
+      <td><span title="532092265">532092265</span></td>
+      <td></td>
+      <td><span title="Electroencephalogram (EEG); including recording awake and drowsy">Electroencephalogram (EEG); including recording awake and drowsy</span></td>
+      <td><span title="2010-11-30">2010-11-30</span></td>
+      <td>1.0</td>
+      <td>2010</td>
+      <td>4</td>
+      <td>12</td>
+      <td><span title="December">December</span></td>
+      <td>1</td>
+      <td>4</td>
+      <td><span title="Wednesday">Wednesday</span></td>
+      <td>False</td>
+      <td>True</td>
+      <td><span title="2010-11-28">2010-11-28</span></td>
+      <td><span title="2010-12-04">2010-12-04</span></td>
+      <td>5824</td>
+      <td>832</td>
+      <td>191</td>
+      <td>16</td>
+      <td>NaN</td>
+      <td>9979265126</td>
+      <td>NaN</td>
+      <td>924318</td>
+      <td>3</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>1809539</td>
+      <td><span title="8E25022F962E20A9">8E25022F962E20A9</span></td>
+      <td>NaN</td>
+      <td>15810</td>
+      <td>NaN</td>
+      <td><span title="IN">IN</span></td>
+      <td>2</td>
+      <td><span title="1932-10-01">1932-10-01</span></td>
+      <td>94</td>
+      <td>78</td>
+      <td>0</td>
+      <td></td>
+      <td>0</td>
+      <td></td>
+      <td>86795265</td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="Outpatient header - 1st position">Outpatient header - 1st position</span></td>
+      <td><span title="Procedure Type">Procedure Type</span></td>
+      <td>246</td>
+      <td><span title="99213">99213</span></td>
+      <td>2414397</td>
+      <td>216737710</td>
+      <td>2414397</td>
+      <td><span title="Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of these 3 key components: An expanded problem focused history; An expanded problem focused examination; Medical decision making of low">Office or other outpatient visit for the evaluation and management of an established patient, which requires at least 2 of these 3 key components: An expanded problem focused history; An expanded problem focused examination; Medical decision making of low</span></td>
+      <td><span title="CPT4">CPT4</span></td>
+      <td>NaN</td>
+      <td><span title="1500NH">1500NH</span></td>
+      <td><span title="Outpatient Facility">Outpatient Facility</span></td>
+      <td><span title="Radiologic examination, spine; thoracic, 2 views">Radiologic examination, spine; thoracic, 2 views</span></td>
+      <td><span title="2010-10-29">2010-10-29</span></td>
+      <td>33.0</td>
+      <td>2010</td>
+      <td>4</td>
+      <td>12</td>
+      <td><span title="December">December</span></td>
+      <td>1</td>
+      <td>4</td>
+      <td><span title="Wednesday">Wednesday</span></td>
+      <td>False</td>
+      <td>True</td>
+      <td><span title="2010-11-28">2010-11-28</span></td>
+      <td><span title="2010-12-04">2010-12-04</span></td>
+      <td>5824</td>
+      <td>832</td>
+      <td>191</td>
+      <td>16</td>
+      <td>NaN</td>
+      <td>6369242009</td>
+      <td>NaN</td>
+      <td>1076</td>
+      <td>40993</td>
+      <td>5832</td>
+    </tr>
+    <tr>
+      <td>1296847</td>
+      <td><span title="254140CEB413A888">254140CEB413A888</span></td>
+      <td>NaN</td>
+      <td>7010</td>
+      <td>NaN</td>
+      <td><span title="CT">CT</span></td>
+      <td>1</td>
+      <td><span title="1919-03-01">1919-03-01</span></td>
+      <td>107</td>
+      <td>91</td>
+      <td>0</td>
+      <td></td>
+      <td>0</td>
+      <td></td>
+      <td>62216119</td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="Outpatient header - 1st position">Outpatient header - 1st position</span></td>
+      <td><span title="Procedure Type">Procedure Type</span></td>
+      <td>335</td>
+      <td><span title="97110">97110</span></td>
+      <td>2314284</td>
+      <td>155366896</td>
+      <td>2314284</td>
+      <td><span title="Therapeutic procedure, 1 or more areas, each 15 minutes; therapeutic exercises to develop strength and endurance, range of motion and flexibility">Therapeutic procedure, 1 or more areas, each 15 minutes; therapeutic exercises to develop strength and endurance, range of motion and flexibility</span></td>
+      <td><span title="CPT4">CPT4</span></td>
+      <td>NaN</td>
+      <td><span title="0700HP">0700HP</span></td>
+      <td><span title="Outpatient Facility">Outpatient Facility</span></td>
+      <td><span title="Culdocentesis">Culdocentesis</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td>0.0</td>
+      <td>2010</td>
+      <td>4</td>
+      <td>12</td>
+      <td><span title="December">December</span></td>
+      <td>1</td>
+      <td>4</td>
+      <td><span title="Wednesday">Wednesday</span></td>
+      <td>False</td>
+      <td>True</td>
+      <td><span title="2010-11-28">2010-11-28</span></td>
+      <td><span title="2010-12-04">2010-12-04</span></td>
+      <td>5824</td>
+      <td>832</td>
+      <td>191</td>
+      <td>16</td>
+      <td>NaN</td>
+      <td>533108241</td>
+      <td>NaN</td>
+      <td>8211</td>
+      <td>1334</td>
+      <td>1291</td>
+    </tr>
+    <tr>
+      <td>1169691</td>
+      <td><span title="0DF3AA1C47806EBC">0DF3AA1C47806EBC</span></td>
+      <td>NaN</td>
+      <td>5200</td>
+      <td>NaN</td>
+      <td><span title="CA">CA</span></td>
+      <td>1</td>
+      <td><span title="1932-03-01">1932-03-01</span></td>
+      <td>94</td>
+      <td>78</td>
+      <td>0</td>
+      <td></td>
+      <td>0</td>
+      <td></td>
+      <td>56110269</td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="Outpatient header - 1st position">Outpatient header - 1st position</span></td>
+      <td><span title="Procedure Type">Procedure Type</span></td>
+      <td>301</td>
+      <td><span title="77075">77075</span></td>
+      <td>2211821</td>
+      <td>140113486</td>
+      <td>2211821</td>
+      <td><span title="Radiologic examination, osseous survey; complete (axial and appendicular skeleton)">Radiologic examination, osseous survey; complete (axial and appendicular skeleton)</span></td>
+      <td><span title="CPT4">CPT4</span></td>
+      <td>NaN</td>
+      <td><span title="0502NA">0502NA</span></td>
+      <td><span title="Outpatient Facility">Outpatient Facility</span></td>
+      <td><span title="Long-term drug therapy">Long-term drug therapy</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td>0.0</td>
+      <td>2010</td>
+      <td>4</td>
+      <td>12</td>
+      <td><span title="December">December</span></td>
+      <td>1</td>
+      <td>4</td>
+      <td><span title="Wednesday">Wednesday</span></td>
+      <td>False</td>
+      <td>True</td>
+      <td><span title="2010-11-28">2010-11-28</span></td>
+      <td><span title="2010-12-04">2010-12-04</span></td>
+      <td>5824</td>
+      <td>832</td>
+      <td>191</td>
+      <td>16</td>
+      <td>NaN</td>
+      <td>2150853459</td>
+      <td>NaN</td>
+      <td>128495</td>
+      <td>63</td>
+      <td>63</td>
+    </tr>
+    <tr>
+      <td>949596</td>
+      <td><span title="29B457439ECAF388">29B457439ECAF388</span></td>
+      <td>NaN</td>
+      <td>1510</td>
+      <td>NaN</td>
+      <td><span title="AL">AL</span></td>
+      <td>2</td>
+      <td><span title="1982-06-01">1982-06-01</span></td>
+      <td>44</td>
+      <td>28</td>
+      <td>0</td>
+      <td></td>
+      <td>0</td>
+      <td></td>
+      <td>45565701</td>
+      <td></td>
+      <td></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td><span title="Outpatient header - 1st position">Outpatient header - 1st position</span></td>
+      <td><span title="Procedure Type">Procedure Type</span></td>
+      <td>195</td>
+      <td><span title="2724">2724</span></td>
+      <td>2001200</td>
+      <td>113795638</td>
+      <td>2001200</td>
+      <td><span title="Biopsy of mouth, unspecified structure">Biopsy of mouth, unspecified structure</span></td>
+      <td><span title="ICD9Proc">ICD9Proc</span></td>
+      <td>NaN</td>
+      <td><span title="665478975">665478975</span></td>
+      <td></td>
+      <td><span title="Long-term drug therapy">Long-term drug therapy</span></td>
+      <td><span title="2010-12-01">2010-12-01</span></td>
+      <td>0.0</td>
+      <td>2010</td>
+      <td>4</td>
+      <td>12</td>
+      <td><span title="December">December</span></td>
+      <td>1</td>
+      <td>4</td>
+      <td><span title="Wednesday">Wednesday</span></td>
+      <td>False</td>
+      <td>True</td>
+      <td><span title="2010-11-28">2010-11-28</span></td>
+      <td><span title="2010-12-04">2010-12-04</span></td>
+      <td>5824</td>
+      <td>832</td>
+      <td>191</td>
+      <td>16</td>
+      <td>NaN</td>
+      <td>7439638100</td>
+      <td>NaN</td>
+      <td>106</td>
+      <td>421152</td>
+      <td>6802</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+    </body>
+    </html>
+    
