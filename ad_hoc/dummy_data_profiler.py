@@ -65,9 +65,6 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
     total_rows = len(df)
     total_cols = len(df.columns)
     
-    # Scrapes min and max dates for any columns having "date" keywords
-    date_range = "N/A"
-    
     # Hierarchy of dates to use for data timespan
     priority_keywords = ['proc_date', 'adm_date', 'dsch_date']
     
@@ -124,8 +121,8 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
     # Prevent long descriptor columns from expanding row height, making sample records hard to read
     preview_df = df.head(5).copy()
 
-    # Convert dataframes to clean HTML tables (escape=False allows the span tooltips to render)
-    sample_html = preview_df.to_html(classes='table table-striped', index=False, escape=False)
+    # Convert dataframes to clean HTML tables
+    sample_html = preview_df.to_html(classes='table table-striped', index=False)
     profile_html = profile_df.to_html(classes='table table-bordered', index=False)
 
     # Assemble HTML report
