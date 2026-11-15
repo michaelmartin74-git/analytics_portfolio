@@ -45,14 +45,15 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
         
         # Finds first file containing "irb" (case-insensitive), otherwise fall back to the first CSV
         file_to_read = next((f for f in csv_files if "irb" in f.name.lower()), csv_files[0])
-        dataset_name = file_to_read.stem
     
     # Filepath Handler: logic if user provides filepath, simply ingest file itself
     elif target_path.is_file():
         file_to_read = target_path
-        dataset_name = format_dataset_name(target_path.stem)
     else:
         raise FileNotFoundError(f"Provided path does not exist: {target_path}")
+    
+    # Format target file stem to "Title Format" (whether resolved from directory or direct path)
+    dataset_name = format_dataset_name(file_to_read.stem)
 
     # Attempts to ingest the CSV and store inside dataframe
     try:
@@ -70,12 +71,10 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
     # Hierarchy of dates to use for data timespan
     priority_keywords = ['proc_date', 'adm_date', 'dsch_date']
     
-    target_col = None
-    for keyword in priority_keywords:
-        match = next((col for col in df.columns if keyword in col.lower()), None)
-        if match:
-            target_col = match
-            break
+    target_col = next(
+    (col for kw in priority_keywords for col in df.columns if kw in col.lower()), 
+    None
+    )
 
     if target_col:
         try:
@@ -88,43 +87,42 @@ def generate_research_codebook_from_csv(path_input: str, output_html_path: str =
     # Column-level profile (types, null counts, null percentages, stats)
     profile_data = []
     for col in df.columns:
-        null_count = df[col].isnull().sum()
+        series = df[col] #each columns values and index in one reference
+        null_count = series.isnull().sum()
         total_non_null = total_rows - null_count
         
-        # Default stats placeholders for non-numeric columns
-        col_min = col_25p = col_med = col_avg = col_75p = col_max = "N/A"
-        
-        # Isolate calculation to numeric/float/int fields only
-        if pd.api.types.is_numeric_dtype(df[col]) and total_non_null > 0 and df[col].dtype != bool:
-            col_min = df[col].min()
-            col_25p = df[col].quantile(0.25)
-            col_med = df[col].median()
-            col_avg = df[col].mean()
-            col_75p = df[col].quantile(0.75)
-            col_max = df[col].max()
-
-        profile_data.append({
+        # Base profile dictionary with non-numeric defaults
+        col_profile = {
             "Column": col,
-            "Type": str(df[col].dtype),
+            "Type": str(series.dtype),
             "Non-Null Count": total_non_null,
             "Null Count": null_count,
             "Null %": round((null_count / total_rows) * 100, 2) if total_rows > 0 else 0,
-            "Min": col_min,
-            "25th Perc.": col_25p,
-            "Median": col_med,
-            "Avg": col_avg,
-            "75th Perc": col_75p,
-            "Max": col_max
-        })
+            "Min": "N/A",
+            "25th Perc.": "N/A",
+            "Median": "N/A",
+            "Avg": "N/A",
+            "75th Perc": "N/A",
+            "Max": "N/A"
+        }
+        
+        # Populate stats if numeric (excluding booleans)
+        if pd.api.types.is_numeric_dtype(series) and total_non_null > 0 and series.dtype != bool:
+            col_profile.update({
+                "Min": series.min(),
+                "25th Perc.": series.quantile(0.25),
+                "Median": series.median(),
+                "Avg": series.mean(),
+                "75th Perc": series.quantile(0.75),
+                "Max": series.max()
+            })
+            
+        profile_data.append(col_profile)
+
     profile_df = pd.DataFrame(profile_data)
 
     # Prevent long descriptor columns from expanding row height, making sample records hard to read
     preview_df = df.head(5).copy()
-    for col in preview_df.select_dtypes(include=['object', 'string']).columns:
-        preview_df[col] = preview_df[col].apply(
-            # Surface tooltip for string columns (CHECK THI GEMINI)
-            lambda val: f'<span title="{val}">{val}</span>' if pd.notnull(val) else ''
-        )
 
     # Convert dataframes to clean HTML tables (escape=False allows the span tooltips to render)
     sample_html = preview_df.to_html(classes='table table-striped', index=False, escape=False)
